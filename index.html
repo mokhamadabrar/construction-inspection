@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Material Handling Checklist — Final v15 (Simple)</title>
+<title>material_handling_checklist_final_v15_simple.html</title>
 <meta name="theme-color" content="#111827"/>
 <style>
   :root{ --brand:#6a1b9a; --row:#f7f9fc; --header:#0ea5e9; --border:#d1d5db; --ok:#16a34a; --bad:#ef4444; --muted:#6b7280; }
@@ -160,7 +160,7 @@
     <div class="label" data-i18n="label_date">Date</div><input id="inp-date" type="date"/>
     <div class="label" data-i18n="label_location">Location</div><input id="inp-location" placeholder="Lokasi"/>
     <div class="label" data-i18n="label_contractor">Kontraktor</div><input id="inp-contractor" placeholder="Nama Kontraktor"/>
-    <div class="label">WhatsApp No.</div><input id="inp-wa" placeholder="+62812xxxxxxx"/>
+    <div class="label">WhatsApp No.</div><input id="inp-wa" value="081185989142" placeholder="+62812xxxxxxx"/>
   </div>
 
   <!-- Checklist Table (DESKRIPSI PERTANYAAN TIDAK DIUBAH) -->
@@ -472,9 +472,11 @@
 
 <script>
 (function(){
-  /* ===== helpers ===== */
   const qsa=(s,r)=> (r||document).querySelectorAll(s);
   const qs=(s,r)=> (r||document).querySelector(s);
+
+  /* ===== DEFAULT NOMOR WA (E.164) ===== */
+  const DEFAULT_WA = '+6281185989142'; // dari 081185989142
 
   /* ===== language (default: ID) ===== */
   let currentLang='id';
@@ -602,7 +604,7 @@
     refreshScores(); window.scrollTo(0,0);
   });
 
-  /* ===== Export DOM (untuk bikin PDF stabil tanpa halaman kosong) ===== */
+  /* ===== Export DOM untuk PDF (stabil, 1 halaman foto) ===== */
   function collectPhotos(){
     const out=[]; qsa('#photos .photo-card').forEach(c=>{
       const img=qs('.photo-stage img',c); const d=qs('.photo-desc',c);
@@ -612,14 +614,10 @@
   function buildExportDOM(){
     const src=qs('#appRoot'); const clone=src.cloneNode(true); clone.id='exportRoot';
     const tb=clone.querySelector('.toolbar'); if(tb) tb.remove();
-
-    // remarks -> div (agar seluruh teks tercetak)
     clone.querySelectorAll('textarea.remarks').forEach(ta=>{
       const div=document.createElement('div'); div.style.cssText='border:1px solid #d1d5db;border-radius:6px;padding:6px 8px;font-size:12px;white-space:pre-wrap;min-height:18px;background:#fff';
       div.textContent=ta.value||''; const wrap=ta.parentNode; wrap.replaceChild(div,ta); const counter=wrap.querySelector('.counter'); if(counter) counter.remove();
     });
-
-    // rebuild Photos 2x2 untuk 1 halaman
     const ph=collectPhotos(); const newPhotos=document.createElement('div'); newPhotos.className='photos';
     for (let s=0;s<4;s++){
       const card=document.createElement('div'); card.className='photo-card'; card.style.cssText='background:#fff;color:#111;border:1px solid #ddd;border-radius:6px;padding:12px';
@@ -631,7 +629,6 @@
     }
     const oldPhotos=clone.querySelector('.photos'); if(oldPhotos){ const br=document.createElement('div'); br.className='html2pdf__page-break'; oldPhotos.parentNode.insertBefore(br, oldPhotos); oldPhotos.replaceWith(newPhotos); }
 
-    // gaya khusus ekspor (offscreen)
     const style=document.createElement('style');
     style.textContent='#exportMount{position:fixed;left:-10000px;top:0;width:794px;z-index:-1}#exportRoot{width:794px;background:#fff;color:#111}#exportRoot *{page-break-before:auto !important;page-break-inside:auto !important}#exportRoot .photos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:0}';
     const mount=document.createElement('div'); mount.id='exportMount'; mount.appendChild(style); mount.appendChild(clone); document.body.appendChild(mount);
@@ -654,6 +651,18 @@
     });
   }
 
+  /* ===== Normalisasi nomor WA (Indonesia) ===== */
+  function normalizeMsisdn(v){
+    v = (v||'').trim();
+    if (!v) return '';
+    const digits = v.replace(/\D/g,'');
+    if (v.startsWith('+')) return '+' + digits;                 // sudah ada +
+    if (digits.startsWith('0')) return '+62' + digits.slice(1); // 08xx -> +628xx
+    if (digits.startsWith('62')) return '+' + digits;           // 62xx -> +62xx
+    // fallback: anggap nomor lokal ID
+    return '+62' + digits;
+  }
+
   /* ===== Send by WhatsApp — Simple Mode (download + buka WA) ===== */
   async function shareViaWhatsAppSimple(){
     const btn = document.getElementById('waBtn');
@@ -671,14 +680,14 @@
       a.href = url; a.download = fname; document.body.appendChild(a); a.click();
       setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 60000);
 
-      // Buka WhatsApp (ke nomor bila diisi)
-      const toRaw = (document.getElementById('inp-wa')?.value || '').trim();
-      const to = toRaw.replace(/[^\d+]/g,'');
+      // Buka WhatsApp (ke nomor default jika kolom kosong)
+      const inputVal = (document.getElementById('inp-wa')?.value || '').trim();
+      const target = normalizeMsisdn(inputVal || DEFAULT_WA);
       const msgID = `PDF sudah diunduh dengan nama: ${fname}. Silakan lampirkan file tersebut dari folder Download.`;
       const msgEN = `The PDF has been downloaded as: ${fname}. Please attach the file from your Downloads folder.`;
       const lang = getLang();
       const msg = encodeURIComponent(lang==='en' ? msgEN : msgID);
-      const waURL = to ? `https://wa.me/${encodeURIComponent(to)}?text=${msg}` : `https://wa.me/?text=${msg}`;
+      const waURL = `https://wa.me/${encodeURIComponent(target.replace('+',''))}?text=${msg}`;
       window.location.href = waURL;
     }catch(e){
       console.error(e);
