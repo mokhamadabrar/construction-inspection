@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Material Handling Checklist — Final v5</title>
+<title>Material Handling Checklist — Final v6 (fix i18n)</title>
 <style>
   :root{
     --brand:#6a1b9a; --row:#f7f9fc; --header:#0ea5e9; --border:#d1d5db;
@@ -30,7 +30,7 @@
     border:1px solid var(--border);border-radius:999px;background:#fff;
     padding:8px 12px; cursor:pointer; user-select:none;
     box-shadow:0 1px 2px rgba(0,0,0,.04);
-    min-height:44px; /* nyaman untuk sentuhan */
+    min-height:44px;
   }
   .lang-btn[aria-pressed="true"]{
     outline:2px solid #0ea5e9; outline-offset:2px;
@@ -40,12 +40,12 @@
   .lang-btn .lbl{font-size:13px;color:#111}
   @media (max-width:480px){
     .lang-btn{padding:8px 10px}
-    .lang-btn .lbl{display:none}  /* hemat ruang di Android */
+    .lang-btn .lbl{display:none}
     .lang-btn img{width:28px}
   }
 
   .meta{display:grid;gap:8px 16px;grid-template-columns:repeat(6,1fr);font-size:13px;margin-bottom:8px}
-  .meta .label{color:var(--muted)}
+  .meta .label{color:#374151}
   .meta input{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px}
 
   /* table */
@@ -99,7 +99,6 @@
     .score-val{font-size:16px}
     .chk-table td{padding:6px}
     .logo-caption{display:none}
-    /* remarks textarea as plain text */
     textarea.remarks{
       border:none !important; outline:none !important; resize:none !important;
       overflow:visible !important; white-space:pre-wrap !important;
@@ -109,10 +108,9 @@
     }
     .counter{display:none}
 
-    /* ---- Photos page only (compact 1 page) ---- */
     .photos{
-      page-break-before: always;   /* start new page for photos */
-      page-break-after: always;    /* keep it as a dedicated page */
+      page-break-before: always;
+      page-break-after: always;
       grid-template-columns: 1fr 1fr;
       gap: 6mm;
       margin-top: 0;
@@ -120,7 +118,7 @@
     .photo-card{
       background:#fff; color:#111;
       border:1px solid #ddd; padding:5mm; border-radius:6px;
-      min-height:120mm; /* ~2 rows per A4 */
+      min-height:120mm;
       break-inside: avoid;
       page-break-inside: avoid;
     }
@@ -142,7 +140,7 @@
     </div>
   </div>
 
-  <!-- Language Buttons (Auto Translate) -->
+  <!-- Language Buttons -->
   <div class="langbar" role="group" aria-label="Auto translate">
     <span class="hint">Auto translate:</span>
     <button id="btnID" type="button" class="lang-btn" aria-pressed="false" aria-label="Indonesia">
@@ -413,7 +411,7 @@
     <div class="score-card"><h4>Total Score <span id="badge" class="badge">0/100</span></h4><div class="score-val" id="totalScore">0%</div></div>
   </div>
 
-  <!-- Photos (will print on a dedicated page) -->
+  <!-- Photos -->
   <div class="photos" id="photos">
     <div class="photo-card" data-slot="1">
       <div class="photo-stage"><span>Tambahkan Foto</span></div>
@@ -456,7 +454,11 @@
 </div>
 
 <script>
-  // ---- scoring (Yes=1, No=0, N/A & kosong: exclude) ----
+  /* ==== LANGUAGE STATE (moved to TOP) ==== */
+  let currentLang = (localStorage.getItem('mhc_lang') === 'en') ? 'en' : 'id';
+  const getLang = () => currentLang; // safe accessor
+
+  /* ==== SCORING ==== */
   function scoreSection(sec){
     const names = new Set();
     sec.querySelectorAll('input[type=radio]').forEach(r=>names.add(r.name));
@@ -500,10 +502,11 @@
   document.querySelectorAll('#chkTable input[type=radio]').forEach(r=>r.addEventListener('change', refreshScores));
   refreshScores();
 
-  // ---- Helpers: generic max enforcement with pop-up alert ----
-  function enforceMaxWithAlert(el, MAX, fieldName, lang){
+  /* ==== LIMIT HELPERS ==== */
+  function enforceMaxWithAlert(el, MAX, fieldName){
     if(el.value.length > MAX){
       el.value = el.value.slice(0, MAX);
+      const lang = getLang();
       const msg = lang==='en'
         ? `Maximum ${MAX} characters for ${fieldName}. Text has been truncated to meet the requirement.`
         : `Maksimal ${MAX} karakter untuk ${fieldName}. Teks telah dipotong agar sesuai ketentuan.`;
@@ -513,7 +516,7 @@
     return false;
   }
 
-  // ---- Remarks (70 chars) + counter + pop-up alert ----
+  /* ==== REMARKS (70) ==== */
   const MAX_REMARKS = 70;
   function updateCounter(area){
     const wrap = area.closest('.remarks-wrap');
@@ -526,18 +529,18 @@
     area.setAttribute('maxlength', String(MAX_REMARKS));
     updateCounter(area);
     area.addEventListener('input', e=>{
-      enforceMaxWithAlert(e.target, MAX_REMARKS, currentLang==='en'?'Remarks':'Remarks', currentLang);
+      enforceMaxWithAlert(e.target, MAX_REMARKS, getLang()==='en'?'Remarks':'Remarks');
       updateCounter(e.target);
     });
     area.addEventListener('paste', e=>{
       setTimeout(()=>{
-        enforceMaxWithAlert(e.target, MAX_REMARKS, currentLang==='en'?'Remarks':'Remarks', currentLang);
+        enforceMaxWithAlert(e.target, MAX_REMARKS, getLang()==='en'?'Remarks':'Remarks');
         updateCounter(e.target);
       },0);
     });
   });
 
-  // ---- Photos: preview + description (58 chars) + printable caption ----
+  /* ==== PHOTOS (58) ==== */
   const MAX_DESC = 58;
   document.querySelectorAll('.photo-card input[type=file]').forEach(inp=>{
     inp.addEventListener('change', e=>{
@@ -552,7 +555,7 @@
   document.querySelectorAll('.photo-card .photo-desc').forEach(desc=>{
     const printBox = desc.closest('.photo-card').querySelector('.photo-desc-print');
     const sync = ()=>{
-      enforceMaxWithAlert(desc, MAX_DESC, currentLang==='en'?'Photo Description':'Deskripsi Foto', currentLang);
+      enforceMaxWithAlert(desc, MAX_DESC, getLang()==='en'?'Photo Description':'Deskripsi Foto');
       printBox.textContent = desc.value ? desc.value : '';
     };
     desc.setAttribute('maxlength', String(MAX_DESC));
@@ -561,10 +564,8 @@
     desc.addEventListener('paste', ()=>setTimeout(sync,0));
   });
 
-  // ---- i18n (runtime) ----
-  let currentLang = localStorage.getItem('mhc_lang') || 'id';
-
-  // Peta pertanyaan: key = "A1..D15" -> elemen .ques
+  /* ==== i18n ==== */
+  // mapping pertanyaan
   function getQuestionMap(){
     const map = {};
     document.querySelectorAll('.chk-table tbody tr').forEach(tr=>{
@@ -576,11 +577,11 @@
   }
   const qMap = getQuestionMap();
 
-  // Baseline ID diambil dari DOM apa adanya (tidak mengubah naskah Anda)
+  // baseline ID dari DOM
   const baselineID = {};
   Object.keys(qMap).forEach(k => baselineID[k] = qMap[k].textContent.trim());
 
-  // Kamus label & pertanyaan EN
+  // kamus
   const i18n = {
     id: {
       labels: {
@@ -668,7 +669,6 @@
       let txt = naTxt;
       if(inp.value==='yes') txt = yesTxt;
       else if(inp.value==='no') txt = noTxt;
-      // ubah text node tanpa merusak input/listener
       let textNode = Array.from(lab.childNodes).find(n=> n.nodeType===Node.TEXT_NODE);
       if(textNode){ textNode.nodeValue = ' ' + txt; }
       else{ lab.appendChild(document.createTextNode(' ' + txt)); }
@@ -678,31 +678,28 @@
     const dict = i18n[lang].questions;
     Object.keys(qMap).forEach(key=>{
       const el = qMap[key];
-      const newTxt = dict[key] || baselineID[key];
-      el.textContent = newTxt;
+      el.textContent = dict[key] || baselineID[key];
     });
   }
-
   function applyLanguage(lang){
-    currentLang = lang;
-    setLabels(lang);
-    setPlaceholders(lang);
-    setQuestions(lang);
-    setRadioLabels(lang);
-    localStorage.setItem('mhc_lang', lang);
-    // update tombol state
-    document.getElementById('btnID').setAttribute('aria-pressed', lang==='id' ? 'true' : 'false');
-    document.getElementById('btnEN').setAttribute('aria-pressed', lang==='en' ? 'true' : 'false');
+    currentLang = (lang==='en') ? 'en' : 'id';
+    setLabels(currentLang);
+    setPlaceholders(currentLang);
+    setQuestions(currentLang);
+    setRadioLabels(currentLang);
+    localStorage.setItem('mhc_lang', currentLang);
+    document.getElementById('btnID').setAttribute('aria-pressed', currentLang==='id' ? 'true' : 'false');
+    document.getElementById('btnEN').setAttribute('aria-pressed', currentLang==='en' ? 'true' : 'false');
   }
 
-  // Init language on load
-  applyLanguage(currentLang);
+  // INIT: default Indonesia
+  applyLanguage(getLang());
 
-  // Tombol translate
+  // Buttons
   document.getElementById('btnID').addEventListener('click', ()=>applyLanguage('id'));
   document.getElementById('btnEN').addEventListener('click', ()=>applyLanguage('en'));
 
-  // ---- print & reset ----
+  /* ==== PRINT & RESET ==== */
   document.getElementById('printBtn').addEventListener('click', ()=>window.print());
   document.getElementById('resetBtn').addEventListener('click', ()=>{
     document.querySelectorAll('#chkTable input[type=radio]').forEach(r=>r.checked=false);
