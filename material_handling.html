@@ -1,6 +1,493 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Material Handling Checklist — Final v9</title>
+<style>
+  :root{
+    --brand:#6a1b9a; --row:#f7f9fc; --header:#0ea5e9; --border:#d1d5db;
+    --ok:#16a34a; --bad:#ef4444; --muted:#6b7280;
+  }
+  *{box-sizing:border-box}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;margin:0;color:#111827;background:#fff}
+  .page{max-width:1050px;margin:16px auto;padding:16px}
+  .title{color:var(--brand);text-align:center;font-weight:800;font-size:clamp(18px,4vw,28px);margin:0 0 6px}
+
+  /* LOGO */
+  .logo-wrap{display:flex;justify-content:center;align-items:center;margin:6px 0 12px}
+  .logo-wrap img{width:min(40vw,260px);height:auto;max-height:120px}
+  .logo-caption{font-size:12px;color:#374151;text-align:center;margin-top:4px}
+
+  /* Language buttons */
+  .langbar{
+    display:flex;justify-content:flex-end;gap:10px;align-items:center;
+    margin:-4px 0 8px; flex-wrap:wrap;
+  }
+  .langbar .hint{font-size:12px;color:#374151;margin-right:4px}
+  .lang-btn{
+    display:inline-flex;align-items:center;gap:8px;
+    border:1px solid var(--border);border-radius:999px;background:#fff;
+    padding:8px 12px; cursor:pointer; user-select:none;
+    box-shadow:0 1px 2px rgba(0,0,0,.04);
+    min-height:44px;
+  }
+  .lang-btn[aria-pressed="true"]{
+    outline:2px solid #0ea5e9; outline-offset:2px;
+    box-shadow:0 0 0 2px rgba(14,165,233,.15) inset;
+  }
+  .lang-btn img{width:24px;height:auto;display:block}
+  .lang-btn .lbl{font-size:13px;color:#111}
+  @media (max-width:480px){
+    .lang-btn{padding:8px 10px}
+    .lang-btn .lbl{display:none}
+    .lang-btn img{width:28px}
+  }
+
+  .meta{display:grid;gap:8px 16px;grid-template-columns:repeat(6,1fr);font-size:13px;margin-bottom:8px}
+  .meta .label{color:#374151}
+  .meta input{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px}
+
+  /* table */
+  .chk-table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid var(--border);border-radius:10px;margin-top:6px}
+  .chk-table thead th{background:var(--header);color:#fff;padding:10px 8px;font-weight:700;font-size:13px;text-align:center;border-right:1px solid var(--header)}
+  .chk-table thead th:last-child{border-right:none}
+  .section-head{background:#e2f3fb;color:#0b4a6f;font-weight:700;padding:8px;font-size:13px;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+  .col-no{width:70px;text-align:center;font-weight:800;color:#0b4a6f}
+  .chk-table td{padding:8px;border-top:1px solid var(--border)}
+  .row-alt{background:var(--row)}
+  .ques{font-size:13px;line-height:1.35}
+  .yn{display:flex;gap:10px;align-items:center}
+  .yn label{display:flex;gap:6px;align-items:center;font-size:13px}
+  .yn input{width:18px;height:18px}
+
+  /* remarks + counter */
+  .remarks{width:100%;min-height:40px;border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:12px;resize:vertical}
+  .subrow td{border-top:none;padding-top:4px;padding-bottom:8px}
+  .remarks-cell{padding:6px 8px 6px}
+  .remarks-wrap{display:flex;flex-direction:column;gap:4px}
+  .counter{font-size:11px;color:#6b7280}
+  .counter.limit{color:var(--bad);font-weight:700}
+
+  /* scores */
+  .scores{display:grid;gap:10px;grid-template-columns:repeat(5,1fr);margin:12px 0 6px}
+  .score-card{border:1px solid var(--border);border-radius:10px;background:#fafafa;padding:10px}
+  .score-card h4{margin:0 0 8px;font-size:13px;color:#0b4a6f}
+  .score-val{font-weight:800;font-size:18px}
+  .badge{border-radius:999px;padding:3px 8px;font-size:11px;margin-left:8px;color:#fff;background:#111827}
+  .good{background:var(--ok)!important} .bad{background:var(--bad)!important}
+
+  /* photos */
+  .photos{display:grid;gap:12px;grid-template-columns:repeat(2,1fr);margin-top:10px}
+  .photo-card{background:#4f81bd;border-radius:14px;padding:10px;color:#fff;min-height:210px;display:flex;flex-direction:column;gap:8px;break-inside:avoid}
+  .photo-stage{flex:1;border:2px dashed rgba(255,255,255,.7);border-radius:12px;display:grid;place-items:center;overflow:hidden;background:rgba(255,255,255,.06)}
+  .photo-stage img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+  .photo-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .photo-actions input[type=file]{color:#fff;font-size:12px}
+  .photo-desc{flex:1;min-width:120px;border:none;border-radius:8px;padding:6px 8px;font-size:12px}
+  .photo-desc-print{display:none;margin-top:6px;font-size:12px;line-height:1.3;background:rgba(255,255,255,.12);padding:4px 6px;border-radius:6px}
+
+  /* footer */
+  .footer{margin-top:14px;text-align:center;font-size:12px;color:#374151}
+  .footer .line{height:1px;background:var(--border);margin:10px 0}
+  .footer b{color:#111827}
+
+  /* toolbar buttons */
+  .toolbar{display:flex;gap:10px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}
+  .btn{border:none;border-radius:10px;padding:10px 14px;font-weight:700;color:#fff}
+  .btn.print{background:#111827}
+  .btn.reset{background:#0ea5e9}
+  .btn.wa{background:#25D366}
+  .btn[disabled]{opacity:.7;cursor:progress}
+
+  /* responsive */
+  @media (max-width:800px){ .meta{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:640px){ .photos{grid-template-columns:1fr} .col-no{width:64px} }
+
+  /* print: A4, remarks printed as text; photos on dedicated page */
+  @page{size:A4 portrait;margin:12mm}
+  @media print{
+    .toolbar{display:none!important}
+    .page{margin:0;padding:0}
+    .score-val{font-size:16px}
+    .chk-table td{padding:6px}
+    .logo-caption{display:none}
+    textarea.remarks{
+      border:none !important; outline:none !important; resize:none !important;
+      overflow:visible !important; white-space:pre-wrap !important;
+      font-size:12px !important; background:transparent !important;
+      height:auto !important; min-height:unset !important;
+      -webkit-appearance:none; appearance:none;
+    }
+    .counter{display:none}
+
+    /* Photos page dedicated */
+    .photos{
+      page-break-before: always;
+      page-break-after: always;
+      grid-template-columns: 1fr 1fr;
+      gap: 6mm;
+      margin-top: 0;
+    }
+    .photo-card{
+      background:#fff; color:#111;
+      border:1px solid #ddd; padding:5mm; border-radius:6px;
+      min-height:120mm; /* ~2 baris per halaman A4 */
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .photo-stage{ border:1px solid #ccc; background:#fff; border-radius:4px; }
+    .photo-actions{display:none}
+    .photo-desc-print{ display:block; font-size:11px; color:#111; background:transparent; padding:0; margin-top:3mm }
+
+    .footer{font-size:11px}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="title">MATERIAL HANDLING CHECKLIST</div>
+
+  <!-- LOGO -->
+  <div class="logo-wrap" aria-label="Logo PT Jaya Obayashi">
+    <div>
+      <img crossorigin="anonymous" referrerpolicy="no-referrer"
+           src="https://mokhamadabrar.github.io/construction-inspection/Logo-JO.png"
+           alt="PT Jaya Obayashi" />
+      <div class="logo-caption">PT Jaya Obayashi</div>
+    </div>
+  </div>
+
+  <!-- Language Buttons -->
+  <div class="langbar" role="group" aria-label="Auto translate">
+    <span class="hint">Auto translate:</span>
+    <button id="btnID" type="button" class="lang-btn" aria-pressed="false" aria-label="Indonesia">
+      <img src="https://mokhamadabrar.github.io/construction-inspection/ID.png" alt="ID"/>
+      <span class="lbl">Indonesia</span>
+    </button>
+    <button id="btnEN" type="button" class="lang-btn" aria-pressed="false" aria-label="English">
+      <img src="https://mokhamadabrar.github.io/construction-inspection/EN.png" alt="EN"/>
+      <span class="lbl">English</span>
+    </button>
+  </div>
+
+  <!-- Meta (termasuk Kontraktor) -->
+  <div class="meta">
+    <div class="label" data-i18n="label_site">Site Assesssor</div><input id="inp-assessor" placeholder="Nama Site Assesssor"/>
+    <div class="label" data-i18n="label_project">Project</div><input id="inp-project" value="JKT09" placeholder="Kode/Nama"/>
+    <div class="label" data-i18n="label_date">Date</div><input id="inp-date" type="date"/>
+    <div class="label" data-i18n="label_location">Location</div><input id="inp-location" placeholder="Lokasi"/>
+    <div class="label" data-i18n="label_contractor">Kontraktor</div><input id="inp-contractor" placeholder="Nama Kontraktor"/>
+  </div>
+
+  <table class="chk-table" id="chkTable">
+    <thead>
+      <tr>
+        <th class="col-no" data-i18n="th_no">No.</th>
+        <th data-i18n="th_question">Pertanyaan</th>
+        <th data-i18n="th_yes">YES</th>
+        <th data-i18n="th_no2">NO</th>
+        <th data-i18n="th_na">N/A</th>
+      </tr>
+    </thead>
+
+    <!-- ===== SECTION A ===== -->
+    <tbody data-section="A">
+      <tr><td class="section-head" colspan="5">A. METHOD OF WORK PLAN</td></tr>
+
+      <tr class="row-alt">
+        <td class="col-no">A1</td>
+        <td colspan="4"><div class="ques">Apakah penempatan material telah sesuai dengan lokasi pada MSRA, dan telah sesuai dengan persyaratan tempat penyimpanan?</div></td>
+      </tr>
+      <tr class="subrow row-alt">
+        <td></td>
+        <td>
+          <div class="yn">
+            <label><input type="radio" name="A1" value="yes"> Ya</label>
+            <label><input type="radio" name="A1" value="no"> Tidak</label>
+            <label><input type="radio" name="A1" value="na"> N/A</label>
+          </div>
+        </td>
+        <td colspan="3" class="remarks-cell">
+          <div class="remarks-wrap">
+            <textarea class="remarks" maxlength="70" placeholder="Remarks (maks 70 karakter)…"></textarea>
+            <div class="counter">0/70</div>
+          </div>
+        </td>
+      </tr>
+
+      <tr>
+        <td class="col-no">A2</td>
+        <td colspan="4"><div class="ques">Apakah berat/dimensi material, metode memindahkan telah didiskusikan? (check MSRA dan bagaimana rute Kendaraan dan pertimbangkan berat beban material)</div></td>
+      </tr>
+      <tr class="subrow">
+        <td></td>
+        <td><div class="yn">
+          <label><input type="radio" name="A2" value="yes"> Ya</label>
+          <label><input type="radio" name="A2" value="no"> Tidak</label>
+          <label><input type="radio" name="A2" value="na"> N/A</label>
+        </div></td>
+        <td colspan="3" class="remarks-cell">
+          <div class="remarks-wrap">
+            <textarea class="remarks" maxlength="70"></textarea>
+            <div class="counter">0/70</div>
+          </div>
+        </td>
+      </tr>
+
+      <tr class="row-alt">
+        <td class="col-no">A3</td>
+        <td colspan="4"><div class="ques">Apakah penempatan material tidak menghalangi pejalan kaki, tersedia akses untuk pengambilan material, dan telah tersedia barricade?</div></td>
+      </tr>
+      <tr class="subrow row-alt">
+        <td></td>
+        <td><div class="yn">
+          <label><input type="radio" name="A3" value="yes"> Ya</label>
+          <label><input type="radio" name="A3" value="no"> Tidak</label>
+          <label><input type="radio" name="A3" value="na"> N/A</label>
+        </div></td>
+        <td colspan="3" class="remarks-cell">
+          <div class="remarks-wrap">
+            <textarea class="remarks" maxlength="70"></textarea>
+            <div class="counter">0/70</div>
+          </div>
+        </td>
+      </tr>
+
+      <tr>
+        <td class="col-no">A4</td>
+        <td colspan="4"><div class="ques">Apakah anda mengetahui batas max angkat manual adalah 18.14 kg. Dan jika material panjang atau >3 m harus diangkat lebih dari satu orang.</div></td>
+      </tr>
+      <tr class="subrow">
+        <td></td>
+        <td><div class="yn">
+          <label><input type="radio" name="A4" value="yes"> Ya</label>
+          <label><input type="radio" name="A4" value="no"> Tidak</label>
+          <label><input type="radio" name="A4" value="na"> N/A</label>
+        </div></td>
+        <td colspan="3" class="remarks-cell">
+          <div class="remarks-wrap">
+            <textarea class="remarks" maxlength="70"></textarea>
+            <div class="counter">0/70</div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+
+    <!-- ===== SECTION B ===== -->
+    <tbody data-section="B">
+      <tr><td class="section-head" colspan="5">B. PEOPLE / COMPETENCE / QUALIFICATION</td></tr>
+
+      <tr class="row-alt"><td class="col-no">B5</td><td colspan="4" class="ques">Kepada siapa anda melapor jika anda membutuhkan alat untuk memindahkan material anda?</td></tr>
+      <tr class="subrow row-alt"><td></td><td><div class="yn">
+        <label><input type="radio" name="B5" value="yes"> Ya</label>
+        <label><input type="radio" name="B5" value="no"> Tidak</label>
+        <label><input type="radio" name="B5" value="na"> N/A</label>
+      </div></td><td colspan="3" class="remarks-cell">
+        <div class="remarks-wrap">
+          <textarea class="remarks" maxlength="70"></textarea>
+          <div class="counter">0/70</div>
+        </div>
+      </td></tr>
+
+      <tr><td class="col-no">B6</td><td colspan="4" class="ques">Apakah anda telah memeriksa bahwa alat pemindah atau pengangkat tersebut telah dilakukan checklist sebelum digunakan?</td></tr>
+      <tr class="subrow"><td></td><td><div class="yn">
+        <label><input type="radio" name="B6" value="yes"> Ya</label>
+        <label><input type="radio" name="B6" value="no"> Tidak</label>
+        <label><input type="radio" name="B6" value="na"> N/A</label>
+      </div></td><td colspan="3" class="remarks-cell">
+        <div class="remarks-wrap">
+          <textarea class="remarks" maxlength="70"></textarea>
+          <div class="counter">0/70</div>
+        </div>
+      </td></tr>
+
+      <tr class="row-alt"><td class="col-no">B7</td><td colspan="4" class="ques">Apakah Operator alat pemindah/angkat telah memiliki lisensi (SIO) dan masih berlaku?</td></tr>
+      <tr class="subrow row-alt"><td></td><td><div class="yn">
+        <label><input type="radio" name="B7" value="yes"> Ya</label>
+        <label><input type="radio" name="B7" value="no"> Tidak</label>
+        <label><input type="radio" name="B7" value="na"> N/A</label>
+      </div></td><td colspan="3" class="remarks-cell">
+        <div class="remarks-wrap">
+          <textarea class="remarks" maxlength="70"></textarea>
+          <div class="counter">0/70</div>
+        </div>
+      </td></tr>
+    </tbody>
+
+    <!-- ===== SECTION C ===== -->
+    <tbody data-section="C">
+      <tr><td class="section-head" colspan="5">C. TOOLS / Equipments</td></tr>
+
+      <tr class="row-alt"><td class="col-no">C8</td><td colspan="4" class="ques">Apakah sertifikasi alat angkat (SILO) tersedia dan masih berlaku?</td></tr>
+      <tr class="subrow row-alt"><td></td><td><div class="yn">
+        <label><input type="radio" name="C8" value="yes"> Ya</label>
+        <label><input type="radio" name="C8" value="no"> Tidak</label>
+        <label><input type="radio" name="C8" value="na"> N/A</label>
+      </div></td><td colspan="3" class="remarks-cell">
+        <div class="remarks-wrap">
+          <textarea class="remarks" maxlength="70"></textarea>
+          <div class="counter">0/70</div>
+        </div>
+      </td></tr>
+
+      <tr><td class="col-no">C9</td><td colspan="4" class="ques">Apakah Alat pemindah (angkat) yang digunakan telah diperiksa sebelum didatangkan / dipakai.</td></tr>
+      <tr class="subrow"><td></td><td><div class="yn">
+        <label><input type="radio" name="C9" value="yes"> Ya</label>
+        <label><input type="radio" name="C9" value="no"> Tidak</label>
+        <label><input type="radio" name="C9" value="na"> N/A</label>
+      </div></td><td colspan="3" class="remarks-cell">
+        <div class="remarks-wrap">
+          <textarea class="remarks" maxlength="70"></textarea>
+          <div class="counter">0/70</div>
+        </div>
+      </td></tr>
+
+      <tr class="row-alt"><td class="col-no">C10</td><td colspan="4" class="ques">Apakah Alat bantu lainnya telah diinspeksi & dinyatakan layak.</td></tr>
+      <tr class="subrow row-alt"><td></td><td><div class="yn">
+        <label><input type="radio" name="C10" value="yes"> Ya</label>
+        <label><input type="radio" name="C10" value="no"> Tidak</label>
+        <label><input type="radio" name="C10" value="na"> N/A</label>
+      </div></td><td colspan="3" class="remarks-cell">
+        <div class="remarks-wrap">
+          <textarea class="remarks" maxlength="70"></textarea>
+          <div class="counter">0/70</div>
+        </div>
+      </td></tr>
+
+      <tr><td class="col-no">C11</td><td colspan="4" class="ques">Apakah PPE telah sesuai dengan aturan MSDS?</td></tr>
+      <tr class="subrow"><td></td><td><div class="yn">
+        <label><input type="radio" name="C11" value="yes"> Ya</label>
+        <label><input type="radio" name="C11" value="no"> Tidak</label>
+        <label><input type="radio" name="C11" value="na"> N/A</label>
+      </div></td><td colspan="3" class="remarks-cell">
+        <div class="remarks-wrap">
+          <textarea class="remarks" maxlength="70"></textarea>
+          <div class="counter">0/70</div>
+        </div>
+      </td></tr>
+    </tbody>
+
+    <!-- ===== SECTION D ===== -->
+    <tbody data-section="D">
+      <tr><td class="section-head" colspan="5">D. ENVIRONMENT MANAGEMENT / CLEAN WORKPLACE</td></tr>
+
+      <tr class="row-alt"><td class="col-no">D12</td><td colspan="4" class="ques">Apakah anda telah memiliki tempat sampah untuk material sisa yang akan dibuang?</td></tr>
+      <tr class="subrow row-alt"><td></td><td><div class="yn">
+        <label><input type="radio" name="D12" value="yes"> Ya</label>
+        <label><input type="radio" name="D12" value="no"> Tidak</label>
+        <label><input type="radio" name="D12" value="na"> N/A</label>
+      </div></td><td colspan="3" class="remarks-cell">
+        <div class="remarks-wrap">
+          <textarea class="remarks" maxlength="70"></textarea>
+          <div class="counter">0/70</div>
+        </div>
+      </td></tr>
+
+      <tr><td class="col-no">D13</td><td colspan="4" class="ques">Apakah anda mengetahui secara harian dimana lokasi koleksi point pembuangan sampah anda</td></tr>
+      <tr class="subrow"><td></td><td><div class="yn">
+        <label><input type="radio" name="D13" value="yes"> Ya</label>
+        <label><input type="radio" name="D13" value="no"> Tidak</label>
+        <label><input type="radio" name="D13" value="na"> N/A</label>
+      </div></td><td colspan="3" class="remarks-cell">
+        <div class="remarks-wrap">
+          <textarea class="remarks" maxlength="70"></textarea>
+          <div class="counter">0/70</div>
+        </div>
+      </td></tr>
+
+      <tr class="row-alt"><td class="col-no">D14</td><td colspan="4" class="ques">Apakah anda telah melakukan kebersihan sebelum bekerja dan sesudah bekerja dan menata kembali peralatan</td></tr>
+      <tr class="subrow row-alt"><td></td><td><div class="yn">
+        <label><input type="radio" name="D14" value="yes"> Ya</label>
+        <label><input type="radio" name="D14" value="no"> Tidak</label>
+        <label><input type="radio" name="D14" value="na"> N/A</label>
+      </div></td><td colspan="3" class="remarks-cell">
+        <div class="remarks-wrap">
+          <textarea class="remarks" maxlength="70"></textarea>
+          <div class="counter">0/70</div>
+        </div>
+      </td></tr>
+
+      <tr><td class="col-no">D15</td><td colspan="4" class="ques">Jika material anda didalam building apakah anda menyediakan Floor Protection dan menghindari terjadinya Debu</td></tr>
+      <tr class="subrow"><td></td><td><div class="yn">
+        <label><input type="radio" name="D15" value="yes"> Ya</label>
+        <label><input type="radio" name="D15" value="no"> Tidak</label>
+        <label><input type="radio" name="D15" value="na"> N/A</label>
+      </div></td><td colspan="3" class="remarks-cell">
+        <div class="remarks-wrap">
+          <textarea class="remarks" maxlength="70"></textarea>
+          <div class="counter">0/70</div>
+        </div>
+      </td></tr>
+    </tbody>
+  </table>
+
+  <!-- Scores -->
+  <div class="scores">
+    <div class="score-card"><h4>Score A</h4><div class="score-val" id="scoreA">0%</div></div>
+    <div class="score-card"><h4>Score B</h4><div class="score-val" id="scoreB">0%</div></div>
+    <div class="score-card"><h4>Score C</h4><div class="score-val" id="scoreC">0%</div></div>
+    <div class="score-card"><h4>Score D</h4><div class="score-val" id="scoreD">0%</div></div>
+    <div class="score-card"><h4>Total Score <span id="badge" class="badge">0/100</span></h4><div class="score-val" id="totalScore">0%</div></div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer" role="contentinfo">
+    <div class="line"></div>
+    <div>Created &amp; Review by</div>
+    <div><b>Tan Vee Meng</b> (JO Safety Director) &amp; <b>Mokhamad Abrar</b> (T&amp;T Safety Advisor)</div>
+    <div>Application Design by <b>Abrar (T&amp;T)</b> @ 2025</div>
+  </div>
+
+  <!-- Photos (halaman khusus saat cetak) -->
+  <div class="photos" id="photos">
+    <div class="photo-card" data-slot="1">
+      <div class="photo-stage"><span>Tambahkan Foto</span></div>
+      <div class="photo-actions">
+        <input type="file" accept="image/*" />
+        <input type="text" class="photo-desc" maxlength="58" placeholder="Deskripsi foto (maks 58)…" />
+      </div>
+      <div class="photo-desc-print"></div>
+    </div>
+    <div class="photo-card" data-slot="2">
+      <div class="photo-stage"><span>Tambahkan Foto</span></div>
+      <div class="photo-actions">
+        <input type="file" accept="image/*" />
+        <input type="text" class="photo-desc" maxlength="58" placeholder="Deskripsi foto (maks 58)…" />
+      </div>
+      <div class="photo-desc-print"></div>
+    </div>
+    <div class="photo-card" data-slot="3">
+      <div class="photo-stage"><span>Tambahkan Foto</span></div>
+      <div class="photo-actions">
+        <input type="file" accept="image/*" />
+        <input type="text" class="photo-desc" maxlength="58" placeholder="Deskripsi foto (maks 58)…" />
+      </div>
+      <div class="photo-desc-print"></div>
+    </div>
+    <div class="photo-card" data-slot="4">
+      <div class="photo-stage"><span>Tambahkan Foto</span></div>
+      <div class="photo-actions">
+        <input type="file" accept="image/*" />
+        <input type="text" class="photo-desc" maxlength="58" placeholder="Deskripsi foto (maks 58)…" />
+      </div>
+      <div class="photo-desc-print"></div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <button class="btn wa" id="waBtn">Send by WhatsApp</button>
+    <button class="btn print" id="printBtn">Print PDF (A4)</button>
+    <button class="btn reset" id="resetBtn">Reset</button>
+  </div>
+</div>
+
+<!-- html2pdf (bundled: html2canvas + jsPDF) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-YcsIP4n2uR2bM8r8ZlLkqGdZz4Vt3H1Z2b1bG6b0y7n5t7o8m9u3qfba7j0YwP2S7eCYbYcTgYJ/Z5x6z6x3wQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 <script>
-  /* ==== LANGUAGE STATE ==== */
+  /* ==== LANGUAGE STATE (default Indonesia) ==== */
   let currentLang = (localStorage.getItem('mhc_lang') === 'en') ? 'en' : 'id';
   const getLang = () => currentLang;
 
@@ -10,7 +497,7 @@
     sec.querySelectorAll('input[type=radio]').forEach(r=>names.add(r.name));
     let yes=0, denom=0;
     names.forEach(n=>{
-      const chosen = sec.querySelector(`input[name="${n}"]:checked`);
+      const chosen = sec.querySelector(\`input[name="\${n}"]:checked\`);
       if(!chosen || chosen.value==='na') return;
       denom++; if(chosen.value==='yes') yes++;
     });
@@ -28,7 +515,7 @@
       const names = new Set();
       sec.querySelectorAll('input[type=radio]').forEach(r=>names.add(r.name));
       names.forEach(n=>{
-        const chosen = sec.querySelector(`input[name="${n}"]:checked`);
+        const chosen = sec.querySelector(\`input[name="\${n}"]:checked\`);
         if(!chosen || chosen.value==='na') return;
         denom++; if(chosen.value==='yes') yes++;
       });
@@ -41,7 +528,7 @@
     document.getElementById('scoreD').textContent = sD + '%';
     document.getElementById('totalScore').textContent = total + '%';
     const badge = document.getElementById('badge');
-    badge.textContent = `${total}/100`;
+    badge.textContent = \`\${total}/100\`;
     badge.classList.remove('good','bad');
     badge.classList.add(total>=80 ? 'good' : 'bad');
   }
@@ -54,8 +541,8 @@
       el.value = el.value.slice(0, MAX);
       const lang = getLang();
       const msg = lang==='en'
-        ? `Maximum ${MAX} characters for ${fieldName}. Text has been truncated to meet the requirement.`
-        : `Maksimal ${MAX} karakter untuk ${fieldName}. Teks telah dipotong agar sesuai ketentuan.`;
+        ? \`Maximum \${MAX} characters for \${fieldName}. Text has been truncated to meet the requirement.\`
+        : \`Maksimal \${MAX} karakter untuk \${fieldName}. Teks telah dipotong agar sesuai ketentuan.\`;
       alert(msg);
       return true;
     }
@@ -68,7 +555,7 @@
     const wrap = area.closest('.remarks-wrap');
     const counter = wrap.querySelector('.counter');
     const len = area.value.length;
-    counter.textContent = `${len}/${MAX_REMARKS}`;
+    counter.textContent = \`\${len}/\${MAX_REMARKS}\`;
     counter.classList.toggle('limit', len >= MAX_REMARKS);
   }
   document.querySelectorAll('textarea.remarks').forEach(area=>{
@@ -231,7 +718,7 @@
     refreshScores(); window.scrollTo({top:0,behavior:'smooth'});
   });
 
-  /* ==== PDF BUILDER (lebih kompatibel) ==== */
+  /* ==== PDF BUILDER (stabil) ==== */
   function filenameFromMeta(){
     const project = (document.getElementById('inp-project').value || 'PROJECT').trim().replace(/\s+/g,'_');
     const date = (document.getElementById('inp-date').value || new Date().toISOString().slice(0,10));
@@ -264,13 +751,13 @@
     toolbar.style.visibility = 'hidden';
 
     try{
-      // Gunakan pipeline yang paling stabil: toPdf().get('pdf')
+      // pipeline stabil
       const worker = html2pdf().set(opt).from(el).toPdf();
       const pdf = await worker.get('pdf');
-      const blob = pdf.output('blob'); // Blob PDF
+      const blob = pdf.output('blob');
       return blob;
     }catch(err1){
-      // Jika ada isu CORS gambar, coba sembunyikan logo lalu ulang
+      // bila ada isu CORS pada logo, coba sembunyikan
       try{
         if(logo) logo.style.visibility = 'hidden';
         const worker = html2pdf().set(opt).from(el).toPdf();
@@ -286,20 +773,18 @@
     }
   }
 
-  /* ==== WHATSAPP SHARE (maksimal otomatis yang diizinkan) ==== */
+  /* ==== SEND BY WHATSAPP ==== */
   async function shareViaWhatsApp(){
-    // upayakan tetap dalam "user gesture"
     const btn = document.getElementById('waBtn');
     const oldHTML = btn.innerHTML;
     btn.disabled = true;
     btn.innerHTML = (getLang()==='en' ? 'Preparing PDF…' : 'Menyiapkan PDF…');
 
     try{
-      // 1) Buat PDF
       const blob = await buildPdfBlobSafe();
       const file = new File([blob], filenameFromMeta(), { type:'application/pdf', lastModified: Date.now() });
 
-      // 2) Share API dengan file (Android Chrome/Edge biasanya OK)
+      // Share Sheet (Android Chrome/Edge) => pilih WhatsApp, lampiran otomatis
       if(navigator.canShare && navigator.canShare({ files:[file] })){
         btn.innerHTML = (getLang()==='en' ? 'Opening WhatsApp…' : 'Membuka WhatsApp…');
         await navigator.share({
@@ -307,11 +792,10 @@
           title:'Material Handling Checklist',
           text:(getLang()==='en' ? 'Material Handling Checklist (PDF attached).' : 'Material Handling Checklist (PDF terlampir).')
         });
-        // selesai; WhatsApp akan terbuka dengan PDF terlampir
         return;
       }
 
-      // 3) Fallback: unduh & buka WhatsApp/WA Web dengan pesan
+      // Fallback: download + open WhatsApp (pesan siap, file dilampirkan manual)
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a'); a.href = url; a.download = filenameFromMeta(); a.click();
       setTimeout(()=>URL.revokeObjectURL(url), 60000);
@@ -319,14 +803,13 @@
       const msgID = 'PDF telah diunduh. Silakan lampirkan file tersebut di WhatsApp.';
       const msgEN = 'PDF downloaded. Please attach the file in WhatsApp.';
       const message = encodeURIComponent(getLang()==='en'? msgEN : msgID);
-      // Prioritas ke aplikasi WhatsApp jika ada; jika tidak, WA Web
       const waUrl = /Android/i.test(navigator.userAgent)
         ? 'https://wa.me/?text=' + message
         : 'https://web.whatsapp.com/send?text=' + message;
       window.open(waUrl, '_blank');
 
       alert(getLang()==='en'
-        ? 'Your browser cannot attach files directly to WhatsApp. The PDF has been downloaded—attach it from your Files.'
+        ? 'Your browser cannot attach files directly to WhatsApp. The PDF has been downloaded—attach it from Files.'
         : 'Browser Anda tidak bisa melampirkan file langsung ke WhatsApp. PDF sudah diunduh—lampirkan dari Files.');
     }catch(err){
       console.error(err);
@@ -339,7 +822,7 @@
     }
   }
 
-  // Tombol
+  // Buttons
   document.getElementById('printBtn').addEventListener('click', ()=>window.print());
   document.getElementById('resetBtn').addEventListener('click', ()=>{
     document.querySelectorAll('#chkTable input[type=radio]').forEach(r=>r.checked=false);
@@ -352,5 +835,7 @@
     });
     refreshScores(); window.scrollTo({top:0,behavior:'smooth'});
   });
-  document.getElementById('waBtn').addEventListener('click', ()=>{ shareViaWhatsApp(); });
+  document.getElementById('waBtn').addEventListener('click', shareViaWhatsApp);
 </script>
+</body>
+</html>
