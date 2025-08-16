@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Material Handling Checklist — Final v3</title>
+<title>Material Handling Checklist — Final v4</title>
 <style>
   :root{
     --brand:#6a1b9a; --row:#f7f9fc; --header:#0ea5e9; --border:#d1d5db;
@@ -18,6 +18,11 @@
   .logo-wrap{display:flex;justify-content:center;align-items:center;margin:6px 0 12px}
   .logo-wrap img{width:min(40vw,260px);height:auto;max-height:120px}
   .logo-caption{font-size:12px;color:#374151;text-align:center;margin-top:4px}
+
+  /* Language bar */
+  .langbar{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin:-4px 0 8px}
+  .langbar label{font-size:12px;color:#374151}
+  .langbar select{border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:12px;background:#fff}
 
   .meta{display:grid;gap:8px 16px;grid-template-columns:repeat(6,1fr);font-size:13px;margin-bottom:8px}
   .meta .label{color:var(--muted)}
@@ -95,7 +100,7 @@
     .photo-card{
       background:#fff; color:#111;
       border:1px solid #ddd; padding:5mm; border-radius:6px;
-      min-height:120mm;                 /* 2 rows per A4 (approx) */
+      min-height:120mm;                 /* approx 2 rows per A4 */
       break-inside: avoid;
       page-break-inside: avoid;
     }
@@ -122,21 +127,30 @@
     </div>
   </div>
 
+  <!-- Language Switcher (tanpa mengubah teks asli) -->
+  <div class="langbar">
+    <label for="langSelect">Bahasa:</label>
+    <select id="langSelect" aria-label="Language">
+      <option value="id" selected>Indonesia</option>
+      <option value="en">English</option>
+    </select>
+  </div>
+
   <div class="meta">
-    <div class="label">Site Assesssor</div><input placeholder="Nama Site Assesssor"/>
-    <div class="label">Project</div><input value="JKT09" placeholder="Kode/Nama"/>
-    <div class="label">Date</div><input type="date"/>
-    <div class="label">Location</div><input placeholder="Lokasi"/>
+    <div class="label" data-i18n="label_site">Site Assesssor</div><input id="inp-assessor" placeholder="Nama Site Assesssor"/>
+    <div class="label" data-i18n="label_project">Project</div><input id="inp-project" value="JKT09" placeholder="Kode/Nama"/>
+    <div class="label" data-i18n="label_date">Date</div><input id="inp-date" type="date"/>
+    <div class="label" data-i18n="label_location">Location</div><input id="inp-location" placeholder="Lokasi"/>
   </div>
 
   <table class="chk-table" id="chkTable">
     <thead>
       <tr>
-        <th class="col-no">No.</th>
-        <th>Pertanyaan</th>
-        <th>YES</th>
-        <th>NO</th>
-        <th>N/A</th>
+        <th class="col-no" data-i18n="th_no">No.</th>
+        <th data-i18n="th_question">Pertanyaan</th>
+        <th data-i18n="th_yes">YES</th>
+        <th data-i18n="th_no2">NO</th>
+        <th data-i18n="th_na">N/A</th>
       </tr>
     </thead>
 
@@ -468,11 +482,14 @@
   refreshScores();
 
   // ---- Helpers: generic max enforcement with pop-up alert ----
-  function enforceMaxWithAlert(el, MAX, fieldName){
+  function enforceMaxWithAlert(el, MAX, fieldName, lang){
     if(el.value.length > MAX){
       el.value = el.value.slice(0, MAX);
       // Alarm pop-up
-      alert(`Maksimal ${MAX} karakter untuk ${fieldName}. Teks telah dipotong agar sesuai ketentuan.`);
+      const msg = lang==='en'
+        ? `Maximum ${MAX} characters for ${fieldName}. Text has been truncated to meet the requirement.`
+        : `Maksimal ${MAX} karakter untuk ${fieldName}. Teks telah dipotong agar sesuai ketentuan.`;
+      alert(msg);
       return true;
     }
     return false;
@@ -491,12 +508,12 @@
     area.setAttribute('maxlength', String(MAX_REMARKS));
     updateCounter(area);
     area.addEventListener('input', e=>{
-      enforceMaxWithAlert(e.target, MAX_REMARKS, 'Remarks');
+      enforceMaxWithAlert(e.target, MAX_REMARKS, currentLang==='en'?'Remarks':'Remarks', currentLang);
       updateCounter(e.target);
     });
     area.addEventListener('paste', e=>{
       setTimeout(()=>{
-        enforceMaxWithAlert(e.target, MAX_REMARKS, 'Remarks');
+        enforceMaxWithAlert(e.target, MAX_REMARKS, currentLang==='en'?'Remarks':'Remarks', currentLang);
         updateCounter(e.target);
       },0);
     });
@@ -518,7 +535,7 @@
   document.querySelectorAll('.photo-card .photo-desc').forEach(desc=>{
     const printBox = desc.closest('.photo-card').querySelector('.photo-desc-print');
     const sync = ()=>{
-      enforceMaxWithAlert(desc, MAX_DESC, 'Deskripsi Foto');
+      enforceMaxWithAlert(desc, MAX_DESC, currentLang==='en'?'Photo Description':'Deskripsi Foto', currentLang);
       printBox.textContent = desc.value ? desc.value : '';
     };
     // init
@@ -527,6 +544,136 @@
     // listeners
     desc.addEventListener('input', sync);
     desc.addEventListener('paste', ()=>setTimeout(sync,0));
+  });
+
+  // ---- i18n (runtime) ----
+  let currentLang = localStorage.getItem('mhc_lang') || 'id';
+  const langSelect = document.getElementById('langSelect');
+  langSelect.value = currentLang;
+
+  // Kumpulkan peta pertanyaan: key = isi sel No. (A1..D15) -> elemen .ques
+  function getQuestionMap(){
+    const map = {};
+    document.querySelectorAll('.chk-table tbody tr').forEach(tr=>{
+      const no = tr.querySelector('.col-no');
+      const q = tr.querySelector('.ques');
+      if(no && q){
+        const key = no.textContent.trim();
+        map[key] = q;
+      }
+    });
+    return map;
+  }
+  const qMap = getQuestionMap();
+
+  // Simpan baseline teks ID langsung dari DOM (tidak mengubah naskah Anda)
+  const baselineID = {};
+  Object.keys(qMap).forEach(k => baselineID[k] = qMap[k].textContent.trim());
+
+  // Kamus EN (silakan koreksi jika perlu)
+  const i18n = {
+    id: {
+      labels: {
+        label_site: "Site Assesssor",
+        label_project: "Project",
+        label_date: "Date",
+        label_location: "Location",
+        th_no: "No.",
+        th_question: "Pertanyaan",
+        th_yes: "YES",
+        th_no2: "NO",
+        th_na: "N/A",
+        ph_assessor: "Nama Site Assesssor",
+        ph_project: "Kode/Nama",
+        ph_location: "Lokasi",
+        ph_remarks: "Remarks (maks 70 karakter)…",
+        ph_photo: "Deskripsi foto (maks 58)…"
+      },
+      questions: baselineID // pakai baseline DOM
+    },
+    en: {
+      labels: {
+        label_site: "Site Assessor",
+        label_project: "Project",
+        label_date: "Date",
+        label_location: "Location",
+        th_no: "No.",
+        th_question: "Question",
+        th_yes: "YES",
+        th_no2: "NO",
+        th_na: "N/A",
+        ph_assessor: "Site assessor name",
+        ph_project: "Code/Name",
+        ph_location: "Location",
+        ph_remarks: "Remarks (max 70 characters)…",
+        ph_photo: "Photo description (max 58)…"
+      },
+      questions: {
+        A1: "Is the placement of materials compliant with the MSRA location and storage requirements?",
+        A2: "Have the material weight/dimensions and movement method been discussed? (check the MSRA; plan vehicle route and consider load weight)",
+        A3: "Does the material placement not obstruct pedestrians, provide access for picking, and are barricades provided?",
+        A4: "Do you know the manual lifting limit is 18.14 kg per person, and loads longer than 3 m must be lifted by more than one person?",
+        B5: "Whom do you report to if you need equipment to move your materials?",
+        B6: "Have you checked that the handling/lifting equipment has been pre-use checklisted?",
+        B7: "Do the handling/lifting equipment operators hold a valid license (SIO)?",
+        C8: "Is the lifting equipment certification (SILO) available and valid?",
+        C9: "Has the handling (lifting) equipment been inspected before being mobilized/used?",
+        C10:"Have other auxiliary tools been inspected and declared fit for use?",
+        C11:"Is the PPE in accordance with MSDS requirements?",
+        D12:"Do you have waste bins for leftover materials to be disposed of?",
+        D13:"Do you know the daily location of your waste collection points?",
+        D14:"Do you clean before and after work and tidy up the tools?",
+        D15:"If your materials are inside the building, do you provide floor protection and prevent dust generation?"
+      }
+    }
+  };
+
+  function setPlaceholders(lang){
+    // meta inputs
+    document.getElementById('inp-assessor').placeholder = i18n[lang].labels.ph_assessor;
+    document.getElementById('inp-project').placeholder  = i18n[lang].labels.ph_project;
+    document.getElementById('inp-location').placeholder = i18n[lang].labels.ph_location;
+    // remarks placeholders
+    document.querySelectorAll('textarea.remarks').forEach(t=>{
+      t.placeholder = i18n[lang].labels.ph_remarks;
+    });
+    // photo desc placeholders
+    document.querySelectorAll('.photo-desc').forEach(p=>{
+      p.placeholder = i18n[lang].labels.ph_photo;
+    });
+  }
+
+  function setLabels(lang){
+    document.querySelectorAll('[data-i18n]').forEach(el=>{
+      const key = el.getAttribute('data-i18n');
+      const txt = i18n[lang].labels[key];
+      if(txt) el.textContent = txt;
+    });
+  }
+
+  function setQuestions(lang){
+    const dict = i18n[lang].questions;
+    Object.keys(qMap).forEach(key=>{
+      const el = qMap[key];
+      const newTxt = dict[key] || baselineID[key];
+      el.textContent = newTxt;
+    });
+  }
+
+  function applyLanguage(lang){
+    currentLang = lang;
+    setLabels(lang);
+    setPlaceholders(lang);
+    setQuestions(lang);
+    localStorage.setItem('mhc_lang', lang);
+  }
+
+  // Inisialisasi bahasa saat load
+  applyLanguage(currentLang);
+
+  // Event ganti bahasa
+  langSelect.addEventListener('change', (e)=>{
+    applyLanguage(e.target.value);
   });
 
   // ---- print & reset ----
