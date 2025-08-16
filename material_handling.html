@@ -3,9 +3,12 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Material Handling Checklist — Final v13</title>
+<title>Material Handling Checklist — Final v7</title>
 <style>
-  :root{ --brand:#6a1b9a; --row:#f7f9fc; --header:#0ea5e9; --border:#d1d5db; --ok:#16a34a; --bad:#ef4444; --muted:#6b7280; }
+  :root{
+    --brand:#6a1b9a; --row:#f7f9fc; --header:#0ea5e9; --border:#d1d5db;
+    --ok:#16a34a; --bad:#ef4444; --muted:#6b7280;
+  }
   *{box-sizing:border-box}
   body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;margin:0;color:#111827;background:#fff}
   .page{max-width:1050px;margin:16px auto;padding:16px}
@@ -17,13 +20,29 @@
   .logo-caption{font-size:12px;color:#374151;text-align:center;margin-top:4px}
 
   /* Language buttons */
-  .langbar{display:flex;justify-content:flex-end;gap:10px;align-items:center;margin:-4px 0 8px;flex-wrap:wrap}
+  .langbar{
+    display:flex;justify-content:flex-end;gap:10px;align-items:center;
+    margin:-4px 0 8px; flex-wrap:wrap;
+  }
   .langbar .hint{font-size:12px;color:#374151;margin-right:4px}
-  .lang-btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:999px;background:#fff;padding:8px 12px;cursor:pointer;user-select:none;box-shadow:0 1px 2px rgba(0,0,0,.04);min-height:44px}
-  .lang-btn[aria-pressed="true"]{outline:2px solid #0ea5e9;outline-offset:2px;box-shadow:0 0 0 2px rgba(14,165,233,.15) inset}
+  .lang-btn{
+    display:inline-flex;align-items:center;gap:8px;
+    border:1px solid var(--border);border-radius:999px;background:#fff;
+    padding:8px 12px; cursor:pointer; user-select:none;
+    box-shadow:0 1px 2px rgba(0,0,0,.04);
+    min-height:44px;
+  }
+  .lang-btn[aria-pressed="true"]{
+    outline:2px solid #0ea5e9; outline-offset:2px;
+    box-shadow:0 0 0 2px rgba(14,165,233,.15) inset;
+  }
   .lang-btn img{width:24px;height:auto;display:block}
   .lang-btn .lbl{font-size:13px;color:#111}
-  @media (max-width:480px){ .lang-btn{padding:8px 10px} .lang-btn .lbl{display:none} .lang-btn img{width:28px} }
+  @media (max-width:480px){
+    .lang-btn{padding:8px 10px}
+    .lang-btn .lbl{display:none}
+    .lang-btn img{width:28px}
+  }
 
   .meta{display:grid;gap:8px 16px;grid-template-columns:repeat(6,1fr);font-size:13px;margin-bottom:8px}
   .meta .label{color:#374151}
@@ -58,7 +77,7 @@
   .badge{border-radius:999px;padding:3px 8px;font-size:11px;margin-left:8px;color:#fff;background:#111827}
   .good{background:var(--ok)!important} .bad{background:var(--bad)!important}
 
-  /* photos (layar) */
+  /* photos */
   .photos{display:grid;gap:12px;grid-template-columns:repeat(2,1fr);margin-top:10px}
   .photo-card{background:#4f81bd;border-radius:14px;padding:10px;color:#fff;min-height:210px;display:flex;flex-direction:column;gap:8px;break-inside:avoid}
   .photo-stage{flex:1;border:2px dashed rgba(255,255,255,.7);border-radius:12px;display:grid;place-items:center;overflow:hidden;background:rgba(255,255,255,.06)}
@@ -73,19 +92,11 @@
   .footer .line{height:1px;background:var(--border);margin:10px 0}
   .footer b{color:#111827}
 
-  /* toolbar buttons */
-  .toolbar{display:flex;gap:10px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}
-  .btn{border:none;border-radius:10px;padding:10px 14px;font-weight:700;color:#fff}
-  .btn.print{background:#111827}
-  .btn.reset{background:#0ea5e9}
-  .btn.wa{background:#25D366}
-  .btn[disabled]{opacity:.7;cursor:progress}
-
   /* responsive */
   @media (max-width:800px){ .meta{grid-template-columns:repeat(2,1fr)} }
   @media (max-width:640px){ .photos{grid-template-columns:1fr} .col-no{width:64px} }
 
-  /* print hanya untuk tombol Print (bukan untuk WA Share) */
+  /* print */
   @page{size:A4 portrait;margin:12mm}
   @media print{
     .toolbar{display:none!important}
@@ -101,25 +112,38 @@
       -webkit-appearance:none; appearance:none;
     }
     .counter{display:none}
-    .photos{page-break-before: always; grid-template-columns: 1fr 1fr; gap: 6mm; margin-top: 0}
-    .photo-card{background:#fff;color:#111;border:1px solid #ddd;padding:5mm;border-radius:6px;min-height:auto;height:120mm;break-inside:avoid;page-break-inside:avoid}
-    .photo-stage{ border:1px solid #ccc; background:#fff; border-radius:4px }
+
+    /* Photos page dedicated */
+    .photos{
+      page-break-before: always;
+      page-break-after: always;  /* akhir dokumen: umumnya tidak menambah halaman kosong */
+      grid-template-columns: 1fr 1fr;
+      gap: 6mm;
+      margin-top: 0;
+    }
+    .photo-card{
+      background:#fff; color:#111;
+      border:1px solid #ddd; padding:5mm; border-radius:6px;
+      min-height:120mm;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .photo-stage{ border:1px solid #ccc; background:#fff; border-radius:4px; }
     .photo-actions{display:none}
     .photo-desc-print{ display:block; font-size:11px; color:#111; background:transparent; padding:0; margin-top:3mm }
+
     .footer{font-size:11px}
   }
 </style>
 </head>
 <body>
-<div class="page" id="appRoot">
+<div class="page">
   <div class="title">MATERIAL HANDLING CHECKLIST</div>
 
   <!-- LOGO -->
   <div class="logo-wrap" aria-label="Logo PT Jaya Obayashi">
     <div>
-      <img crossorigin="anonymous" referrerpolicy="no-referrer"
-           src="https://mokhamadabrar.github.io/construction-inspection/Logo-JO.png"
-           alt="PT Jaya Obayashi" />
+      <img src="https://mokhamadabrar.github.io/construction-inspection/Logo-JO.png" alt="PT Jaya Obayashi" />
       <div class="logo-caption">PT Jaya Obayashi</div>
     </div>
   </div>
@@ -137,7 +161,7 @@
     </button>
   </div>
 
-  <!-- Meta -->
+  <!-- Meta (tambah Kontraktor) -->
   <div class="meta">
     <div class="label" data-i18n="label_site">Site Assesssor</div><input id="inp-assessor" placeholder="Nama Site Assesssor"/>
     <div class="label" data-i18n="label_project">Project</div><input id="inp-project" value="JKT09" placeholder="Kode/Nama"/>
@@ -146,7 +170,6 @@
     <div class="label" data-i18n="label_contractor">Kontraktor</div><input id="inp-contractor" placeholder="Nama Kontraktor"/>
   </div>
 
-  <!-- Tabel Checklist (sesuai skrip Anda) -->
   <table class="chk-table" id="chkTable">
     <thead>
       <tr>
@@ -161,6 +184,7 @@
     <!-- ===== SECTION A ===== -->
     <tbody data-section="A">
       <tr><td class="section-head" colspan="5">A. METHOD OF WORK PLAN</td></tr>
+
       <tr class="row-alt">
         <td class="col-no">A1</td>
         <td colspan="4"><div class="ques">Apakah penempatan material telah sesuai dengan lokasi pada MSRA, dan telah sesuai dengan persyaratan tempat penyimpanan?</div></td>
@@ -397,7 +421,7 @@
     <div class="score-card"><h4>Total Score <span id="badge" class="badge">0/100</span></h4><div class="score-val" id="totalScore">0%</div></div>
   </div>
 
-  <!-- Footer -->
+  <!-- Footer (diletakkan sebelum halaman Foto saat print) -->
   <div class="footer" role="contentinfo">
     <div class="line"></div>
     <div>Created &amp; Review by</div>
@@ -405,7 +429,7 @@
     <div>Application Design by <b>Abrar (T&amp;T)</b> @ 2025</div>
   </div>
 
-  <!-- Photos (layar) -->
+  <!-- Photos (akan menjadi halaman tersendiri saat print) -->
   <div class="photos" id="photos">
     <div class="photo-card" data-slot="1">
       <div class="photo-stage"><span>Tambahkan Foto</span></div>
@@ -441,391 +465,276 @@
     </div>
   </div>
 
-  <!-- Toolbar -->
-  <div class="toolbar">
-    <button class="btn wa" id="waBtn">Send by WhatsApp</button>
-    <button class="btn print" id="printBtn">Print PDF (A4)</button>
-    <button class="btn reset" id="resetBtn">Reset</button>
+  <div class="toolbar" style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap">
+    <button class="btn" id="printBtn" style="border:none;border-radius:10px;padding:10px 14px;font-weight:700;background:#111827;color:#fff">Print PDF (A4)</button>
+    <button class="btn" id="resetBtn" style="border:none;border-radius:10px;padding:10px 14px;font-weight:700;background:#0ea5e9;color:#fff">Reset</button>
   </div>
 </div>
 
-<!-- html2pdf (bundled) -->
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
 <script>
-(function(){
-  /* ===== helpers ===== */
-  function qsa(sel, root){ return (root||document).querySelectorAll(sel); }
-  function qs(sel, root){ return (root||document).querySelector(sel); }
+  /* ==== LANGUAGE STATE ==== */
+  let currentLang = (localStorage.getItem('mhc_lang') === 'en') ? 'en' : 'id';
+  const getLang = () => currentLang;
 
-  /* ===== language ===== */
-  var currentLang = 'id';
-  try { currentLang = (localStorage.getItem('mhc_lang') === 'en') ? 'en' : 'id'; } catch(e){}
-  function getLang(){ return currentLang; }
-
-  /* ===== scoring ===== */
+  /* ==== SCORING ==== */
   function scoreSection(sec){
-    var names = {}, radios = qsa('input[type=radio]', sec);
-    for (var i=0;i<radios.length;i++){ names[radios[i].name] = true; }
-    var yes=0, denom=0;
-    for (var n in names){
-      var chosen = sec.querySelector('input[name="'+n+'"]:checked');
-      if (!chosen || chosen.value==='na') continue;
-      denom++; if (chosen.value==='yes') yes++;
-    }
-    return denom ? Math.round(100*yes/denom) : 0;
+    const names = new Set();
+    sec.querySelectorAll('input[type=radio]').forEach(r=>names.add(r.name));
+    let yes=0, denom=0;
+    names.forEach(n=>{
+      const chosen = sec.querySelector(`input[name="${n}"]:checked`);
+      if(!chosen || chosen.value==='na') return;
+      denom++; if(chosen.value==='yes') yes++;
+    });
+    return denom? Math.round(100*yes/denom):0;
   }
   function refreshScores(){
-    var A = qs('tbody[data-section="A"]'),
-        B = qs('tbody[data-section="B"]'),
-        C = qs('tbody[data-section="C"]'),
-        D = qs('tbody[data-section="D"]');
-    var sA = scoreSection(A), sB = scoreSection(B), sC = scoreSection(C), sD = scoreSection(D);
+    const A = document.querySelector('tbody[data-section="A"]');
+    const B = document.querySelector('tbody[data-section="B"]');
+    const C = document.querySelector('tbody[data-section="C"]');
+    const D = document.querySelector('tbody[data-section="D"]');
+    const sA = scoreSection(A), sB = scoreSection(B), sC = scoreSection(C), sD = scoreSection(D);
 
-    var secs = [A,B,C,D], yes=0, denom=0;
-    for (var i=0;i<secs.length;i++){
-      var names = {}, radios = qsa('input[type=radio]', secs[i]);
-      for (var j=0;j<radios.length;j++){ names[radios[j].name] = true; }
-      for (var k in names){
-        var chosen = secs[i].querySelector('input[name="'+k+'"]:checked');
-        if (!chosen || chosen.value==='na') continue;
-        denom++; if (chosen.value==='yes') yes++;
-      }
-    }
-    var total = denom ? Math.round(100*yes/denom) : 0;
+    let yes=0, denom=0;
+    [A,B,C,D].forEach(sec=>{
+      const names = new Set();
+      sec.querySelectorAll('input[type=radio]').forEach(r=>names.add(r.name));
+      names.forEach(n=>{
+        const chosen = sec.querySelector(`input[name="${n}"]:checked`);
+        if(!chosen || chosen.value==='na') return;
+        denom++; if(chosen.value==='yes') yes++;
+      });
+    });
+    const total = denom? Math.round(100*yes/denom):0;
 
-    qs('#scoreA').textContent = sA + '%';
-    qs('#scoreB').textContent = sB + '%';
-    qs('#scoreC').textContent = sC + '%';
-    qs('#scoreD').textContent = sD + '%';
-    qs('#totalScore').textContent = total + '%';
-    var badge = qs('#badge');
-    badge.textContent = total + '/100';
-    badge.classList.remove('good'); badge.classList.remove('bad');
+    document.getElementById('scoreA').textContent = sA + '%';
+    document.getElementById('scoreB').textContent = sB + '%';
+    document.getElementById('scoreC').textContent = sC + '%';
+    document.getElementById('scoreD').textContent = sD + '%';
+    document.getElementById('totalScore').textContent = total + '%';
+    const badge = document.getElementById('badge');
+    badge.textContent = `${total}/100`;
+    badge.classList.remove('good','bad');
     badge.classList.add(total>=80 ? 'good' : 'bad');
   }
-  var radiosAll = qsa('#chkTable input[type=radio]');
-  for (var r=0;r<radiosAll.length;r++){ radiosAll[r].addEventListener('change', refreshScores, false); }
+  document.querySelectorAll('#chkTable input[type=radio]').forEach(r=>r.addEventListener('change', refreshScores));
   refreshScores();
 
-  /* ===== limits ===== */
+  /* ==== LIMIT HELPERS ==== */
   function enforceMaxWithAlert(el, MAX, fieldName){
-    if (el.value.length > MAX){
+    if(el.value.length > MAX){
       el.value = el.value.slice(0, MAX);
-      var msg = (getLang()==='en')
-        ? ('Maximum ' + MAX + ' characters for ' + fieldName + '. Text has been truncated.')
-        : ('Maksimal ' + MAX + ' karakter untuk ' + fieldName + '. Teks dipotong.');
+      const lang = getLang();
+      const msg = lang==='en'
+        ? `Maximum ${MAX} characters for ${fieldName}. Text has been truncated to meet the requirement.`
+        : `Maksimal ${MAX} karakter untuk ${fieldName}. Teks telah dipotong agar sesuai ketentuan.`;
       alert(msg);
       return true;
     }
     return false;
   }
 
-  /* ===== remarks (70) ===== */
-  var MAX_REMARKS = 70;
+  /* ==== REMARKS (70) ==== */
+  const MAX_REMARKS = 70;
   function updateCounter(area){
-    var wrap = area.closest('.remarks-wrap');
-    var counter = qs('.counter', wrap);
-    var len = area.value.length;
-    counter.textContent = len + '/' + MAX_REMARKS;
-    if (len >= MAX_REMARKS) counter.classList.add('limit'); else counter.classList.remove('limit');
+    const wrap = area.closest('.remarks-wrap');
+    const counter = wrap.querySelector('.counter');
+    const len = area.value.length;
+    counter.textContent = `${len}/${MAX_REMARKS}`;
+    counter.classList.toggle('limit', len >= MAX_REMARKS);
   }
-  var remarkAreas = qsa('textarea.remarks');
-  for (var i=0;i<remarkAreas.length;i++){
-    (function(area){
-      area.setAttribute('maxlength', String(MAX_REMARKS));
-      updateCounter(area);
-      area.addEventListener('input', function(){ enforceMaxWithAlert(area, MAX_REMARKS, 'Remarks'); updateCounter(area); }, false);
-      area.addEventListener('paste', function(){ setTimeout(function(){ enforceMaxWithAlert(area, MAX_REMARKS, 'Remarks'); updateCounter(area); },0); }, false);
-    })(remarkAreas[i]);
-  }
+  document.querySelectorAll('textarea.remarks').forEach(area=>{
+    area.setAttribute('maxlength', String(MAX_REMARKS));
+    updateCounter(area);
+    area.addEventListener('input', e=>{
+      enforceMaxWithAlert(e.target, MAX_REMARKS, getLang()==='en'?'Remarks':'Remarks');
+      updateCounter(e.target);
+    });
+    area.addEventListener('paste', e=>{
+      setTimeout(()=>{
+        enforceMaxWithAlert(e.target, MAX_REMARKS, getLang()==='en'?'Remarks':'Remarks');
+        updateCounter(e.target);
+      },0);
+    });
+  });
 
-  /* ===== photos (58) ===== */
-  var MAX_DESC = 58;
-  var photoFileInputs = qsa('.photo-card input[type=file]');
-  for (i=0;i<photoFileInputs.length;i++){
-    photoFileInputs[i].addEventListener('change', function(e){
-      var file = e.target.files[0]; if(!file) return;
-      var card = e.target.closest('.photo-card');
-      var stage = card.querySelector('.photo-stage');
-      var img = document.createElement('img');
-      var rd = new FileReader();
-      rd.onload = function(ev){ stage.innerHTML=''; img.src = ev.target.result; stage.appendChild(img); };
+  /* ==== PHOTOS (58) ==== */
+  const MAX_DESC = 58;
+  document.querySelectorAll('.photo-card input[type=file]').forEach(inp=>{
+    inp.addEventListener('change', e=>{
+      const file = e.target.files[0]; if(!file) return;
+      const stage = e.target.closest('.photo-card').querySelector('.photo-stage');
+      const img = document.createElement('img');
+      const rd = new FileReader();
+      rd.onload = ev=>{ stage.innerHTML=''; img.src = ev.target.result; stage.appendChild(img); };
       rd.readAsDataURL(file);
-    }, false);
-  }
-  var photoDescs = qsa('.photo-card .photo-desc');
-  for (i=0;i<photoDescs.length;i++){
-    (function(desc){
-      var printBox = desc.closest('.photo-card').querySelector('.photo-desc-print');
-      function sync(){ enforceMaxWithAlert(desc, MAX_DESC, (getLang()==='en'?'Photo Description':'Deskripsi Foto')); printBox.textContent = desc.value ? desc.value : ''; }
-      desc.setAttribute('maxlength', String(MAX_DESC)); sync();
-      desc.addEventListener('input', sync, false);
-      desc.addEventListener('paste', function(){ setTimeout(sync,0); }, false);
-    })(photoDescs[i]);
-  }
+    });
+  });
+  document.querySelectorAll('.photo-card .photo-desc').forEach(desc=>{
+    const printBox = desc.closest('.photo-card').querySelector('.photo-desc-print');
+    const sync = ()=>{
+      enforceMaxWithAlert(desc, MAX_DESC, getLang()==='en'?'Photo Description':'Deskripsi Foto');
+      printBox.textContent = desc.value ? desc.value : '';
+    };
+    desc.setAttribute('maxlength', String(MAX_DESC));
+    sync();
+    desc.addEventListener('input', sync);
+    desc.addEventListener('paste', ()=>setTimeout(sync,0));
+  });
 
-  /* ===== i18n ===== */
+  /* ==== i18n ==== */
+  // mapping pertanyaan
   function getQuestionMap(){
-    var map = {}, trs = qsa('.chk-table tbody tr');
-    for (var k=0;k<trs.length;k++){
-      var no = qs('.col-no', trs[k]);
-      var q = qs('.ques', trs[k]);
-      if (no && q){ map[no.textContent.replace(/\s+/g,'').trim()] = q; }
-    }
+    const map = {};
+    document.querySelectorAll('.chk-table tbody tr').forEach(tr=>{
+      const no = tr.querySelector('.col-no');
+      const q = tr.querySelector('.ques');
+      if(no && q){ map[no.textContent.trim()] = q; }
+    });
     return map;
   }
-  var qMap = getQuestionMap();
-  var baselineID = {}; for (var key in qMap){ if (qMap.hasOwnProperty(key)) baselineID[key] = qMap[key].textContent.trim(); }
-  var i18n = {
-    id:{labels:{label_site:"Site Assesssor",label_project:"Project",label_date:"Date",label_location:"Location",label_contractor:"Kontraktor",
-      th_no:"No.",th_question:"Pertanyaan",th_yes:"YES",th_no2:"NO",th_na:"N/A",
-      ph_assessor:"Nama Site Assesssor",ph_project:"Kode/Nama",ph_location:"Lokasi",ph_contractor:"Nama Kontraktor",
-      ph_remarks:"Remarks (maks 70 karakter)…",ph_photo:"Deskripsi foto (maks 58)…",radio_yes:"Ya",radio_no:"Tidak",radio_na:"N/A"},
-      questions:baselineID},
-    en:{labels:{label_site:"Site Assessor",label_project:"Project",label_date:"Date",label_location:"Location",label_contractor:"Contractor",
-      th_no:"No.",th_question:"Question",th_yes:"YES",th_no2:"NO",th_na:"N/A",
-      ph_assessor:"Site assessor name",ph_project:"Code/Name",ph_location:"Location",ph_contractor:"Contractor name",
-      ph_remarks:"Remarks (max 70 characters)…",ph_photo:"Photo description (max 58)…",radio_yes:"Yes",radio_no:"No",radio_na:"N/A"},
-      questions:{
-        A1:"Is the placement of materials compliant with the MSRA location and storage requirements?",
-        A2:"Have the material weight/dimensions and movement method been discussed? (check the MSRA; plan vehicle route and consider load weight)",
-        A3:"Does the material placement not obstruct pedestrians, provide access for picking, and are barricades provided?",
-        A4:"Do you know the manual lifting limit is 18.14 kg per person, and loads longer than 3 m must be lifted by more than one person?",
-        B5:"Whom do you report to if you need equipment to move your materials?",
-        B6:"Have you checked that the handling/lifting equipment has been pre-use checklisted?",
-        B7:"Do the handling/lifting equipment operators hold a valid license (SIO)?",
-        C8:"Is the lifting equipment certification (SILO) available and valid?",
-        C9:"Has the handling (lifting) equipment been inspected before being mobilized/used?",
+  const qMap = getQuestionMap();
+
+  // baseline ID dari DOM (teks pertanyaan tidak diubah)
+  const baselineID = {};
+  Object.keys(qMap).forEach(k => baselineID[k] = qMap[k].textContent.trim());
+
+  // kamus
+  const i18n = {
+    id: {
+      labels: {
+        label_site: "Site Assesssor",
+        label_project: "Project",
+        label_date: "Date",
+        label_location: "Location",
+        label_contractor: "Kontraktor",
+        th_no: "No.",
+        th_question: "Pertanyaan",
+        th_yes: "YES",
+        th_no2: "NO",
+        th_na: "N/A",
+        ph_assessor: "Nama Site Assesssor",
+        ph_project: "Kode/Nama",
+        ph_location: "Lokasi",
+        ph_contractor: "Nama Kontraktor",
+        ph_remarks: "Remarks (maks 70 karakter)…",
+        ph_photo: "Deskripsi foto (maks 58)…",
+        radio_yes: "Ya",
+        radio_no: "Tidak",
+        radio_na: "N/A"
+      },
+      questions: baselineID
+    },
+    en: {
+      labels: {
+        label_site: "Site Assessor",
+        label_project: "Project",
+        label_date: "Date",
+        label_location: "Location",
+        label_contractor: "Contractor",
+        th_no: "No.",
+        th_question: "Question",
+        th_yes: "YES",
+        th_no2: "NO",
+        th_na: "N/A",
+        ph_assessor: "Site assessor name",
+        ph_project: "Code/Name",
+        ph_location: "Location",
+        ph_contractor: "Contractor name",
+        ph_remarks: "Remarks (max 70 characters)…",
+        ph_photo: "Photo description (max 58)…",
+        radio_yes: "Yes",
+        radio_no: "No",
+        radio_na: "N/A"
+      },
+      questions: {
+        A1: "Is the placement of materials compliant with the MSRA location and storage requirements?",
+        A2: "Have the material weight/dimensions and movement method been discussed? (check the MSRA; plan vehicle route and consider load weight)",
+        A3: "Does the material placement not obstruct pedestrians, provide access for picking, and are barricades provided?",
+        A4: "Do you know the manual lifting limit is 18.14 kg per person, and loads longer than 3 m must be lifted by more than one person?",
+        B5: "Whom do you report to if you need equipment to move your materials?",
+        B6: "Have you checked that the handling/lifting equipment has been pre-use checklisted?",
+        B7: "Do the handling/lifting equipment operators hold a valid license (SIO)?",
+        C8: "Is the lifting equipment certification (SILO) available and valid?",
+        C9: "Has the handling (lifting) equipment been inspected before being mobilized/used?",
         C10:"Have other auxiliary tools been inspected and declared fit for use?",
         C11:"Is the PPE in accordance with MSDS requirements?",
         D12:"Do you have waste bins for leftover materials to be disposed of?",
         D13:"Do you know the daily location of your waste collection points?",
         D14:"Do you clean before and after work and tidy up the tools?",
         D15:"If your materials are inside the building, do you provide floor protection and prevent dust generation?"
-      }}
+      }
+    }
   };
+
   function setPlaceholders(lang){
-    qs('#inp-assessor').placeholder = i18n[lang].labels.ph_assessor;
-    qs('#inp-project').placeholder  = i18n[lang].labels.ph_project;
-    qs('#inp-location').placeholder = i18n[lang].labels.ph_location;
-    qs('#inp-contractor').placeholder = i18n[lang].labels.ph_contractor;
-    var t,i; t=qsa('textarea.remarks'); for(i=0;i<t.length;i++){ t[i].placeholder=i18n[lang].labels.ph_remarks; }
-    t=qsa('.photo-desc'); for(i=0;i<t.length;i++){ t[i].placeholder=i18n[lang].labels.ph_photo; }
+    document.getElementById('inp-assessor').placeholder = i18n[lang].labels.ph_assessor;
+    document.getElementById('inp-project').placeholder  = i18n[lang].labels.ph_project;
+    document.getElementById('inp-location').placeholder = i18n[lang].labels.ph_location;
+    document.getElementById('inp-contractor').placeholder = i18n[lang].labels.ph_contractor;
+    document.querySelectorAll('textarea.remarks').forEach(t=> t.placeholder = i18n[lang].labels.ph_remarks);
+    document.querySelectorAll('.photo-desc').forEach(p=> p.placeholder = i18n[lang].labels.ph_photo);
   }
   function setLabels(lang){
-    var all = qsa('[data-i18n]'); for (var i=0;i<all.length;i++){ var key=all[i].getAttribute('data-i18n'); var txt=i18n[lang].labels[key]; if(txt) all[i].textContent=txt; }
+    document.querySelectorAll('[data-i18n]').forEach(el=>{
+      const key = el.getAttribute('data-i18n');
+      const txt = i18n[lang].labels[key];
+      if(txt) el.textContent = txt;
+    });
   }
   function setRadioLabels(lang){
-    var yesTxt=i18n[lang].labels.radio_yes, noTxt=i18n[lang].labels.radio_no, naTxt=i18n[lang].labels.radio_na;
-    var labs=qsa('.yn label');
-    for (var i=0;i<labs.length;i++){
-      var lab=labs[i], inp=qs('input',lab); if(!inp) continue;
-      var txt = (inp.value==='yes')?yesTxt:(inp.value==='no')?noTxt:naTxt;
-      var foundText=null; for (var c=0;c<lab.childNodes.length;c++){ if(lab.childNodes[c].nodeType===3){ foundText=lab.childNodes[c]; break; } }
-      if(foundText){ foundText.nodeValue=' '+txt; } else { lab.appendChild(document.createTextNode(' '+txt)); }
-    }
+    const yesTxt = i18n[lang].labels.radio_yes;
+    const noTxt  = i18n[lang].labels.radio_no;
+    const naTxt  = i18n[lang].labels.radio_na;
+    document.querySelectorAll('.yn label').forEach(lab=>{
+      const inp = lab.querySelector('input');
+      if(!inp) return;
+      let txt = naTxt;
+      if(inp.value==='yes') txt = yesTxt;
+      else if(inp.value==='no') txt = noTxt;
+      let textNode = Array.from(lab.childNodes).find(n=> n.nodeType===Node.TEXT_NODE);
+      if(textNode){ textNode.nodeValue = ' ' + txt; }
+      else{ lab.appendChild(document.createTextNode(' ' + txt)); }
+    });
   }
   function setQuestions(lang){
-    var dict = i18n[lang].questions; for (var key in qMap){ if(!qMap.hasOwnProperty(key)) continue; qMap[key].textContent = dict[key] || baselineID[key]; }
+    const dict = i18n[lang].questions;
+    Object.keys(qMap).forEach(key=>{
+      const el = qMap[key];
+      el.textContent = dict[key] || baselineID[key];
+    });
   }
   function applyLanguage(lang){
     currentLang = (lang==='en') ? 'en' : 'id';
-    setLabels(currentLang); setPlaceholders(currentLang); setQuestions(currentLang); setRadioLabels(currentLang);
-    try { localStorage.setItem('mhc_lang', currentLang); } catch(e){}
-    qs('#btnID').setAttribute('aria-pressed', currentLang==='id' ? 'true' : 'false');
-    qs('#btnEN').setAttribute('aria-pressed', currentLang==='en' ? 'true' : 'false');
+    setLabels(currentLang);
+    setPlaceholders(currentLang);
+    setQuestions(currentLang);
+    setRadioLabels(currentLang);
+    localStorage.setItem('mhc_lang', currentLang);
+    document.getElementById('btnID').setAttribute('aria-pressed', currentLang==='id' ? 'true' : 'false');
+    document.getElementById('btnEN').setAttribute('aria-pressed', currentLang==='en' ? 'true' : 'false');
   }
-  applyLanguage(currentLang);
-  qs('#btnID').addEventListener('click', function(){ applyLanguage('id'); }, false);
-  qs('#btnEN').addEventListener('click', function(){ applyLanguage('en'); }, false);
 
-  /* ===== Print & Reset ===== */
-  qs('#printBtn').addEventListener('click', function(){ window.print(); }, false);
-  qs('#resetBtn').addEventListener('click', function(){
-    var rs=qsa('#chkTable input[type=radio]'); for (var i=0;i<rs.length;i++){ rs[i].checked=false; }
-    var rem=qsa('.remarks'); for (i=0;i<rem.length;i++){ rem[i].value=''; updateCounter(rem[i]); }
-    var cards=qsa('.photo-card'); for (i=0;i<cards.length;i++){
-      qs('.photo-stage',cards[i]).innerHTML='<span>Tambahkan Foto</span>';
-      var f=qs('input[type=file]',cards[i]); if(f) f.value='';
-      var d=qs('.photo-desc',cards[i]); if(d) d.value='';
-      var pb=qs('.photo-desc-print',cards[i]); if(pb) pb.textContent='';
-    }
-    refreshScores(); window.scrollTo(0,0);
-  }, false);
+  // INIT: default Indonesia
+  applyLanguage(getLang());
 
-  /* ===== Export builder (fix halaman kosong & foto 1 halaman) ===== */
-  function collectPhotosData(){
-    var out = [];
-    var cards = qsa('#photos .photo-card');
-    for (var i=0;i<cards.length;i++){
-      var imgEl = qs('.photo-stage img', cards[i]);
-      var descEl = qs('.photo-desc', cards[i]);
-      out.push({
-        src: imgEl ? imgEl.src : null,
-        desc: descEl ? (descEl.value || '') : ''
-      });
-    }
-    return out;
-  }
-  function buildExportDOM(){
-    // clone konten utama
-    var src = qs('#appRoot');
-    var clone = src.cloneNode(true);
-    clone.id = 'exportRoot';
+  // Buttons
+  document.getElementById('btnID').addEventListener('click', ()=>applyLanguage('id'));
+  document.getElementById('btnEN').addEventListener('click', ()=>applyLanguage('en'));
 
-    // Hilangkan toolbar di clone
-    var tb = clone.querySelector('.toolbar'); if (tb) tb.parentNode.removeChild(tb);
-
-    // Ubah textarea remarks -> div teks biasa
-    var tas = clone.querySelectorAll('textarea.remarks');
-    for (var i=0;i<tas.length;i++){
-      var ta = tas[i];
-      var val = ta.value || '';
-      var div = document.createElement('div');
-      div.style.cssText='border:1px solid #d1d5db;border-radius:6px;padding:6px 8px;font-size:12px;white-space:pre-wrap;min-height:18px;background:#fff';
-      div.textContent = val;
-      var wrap = ta.parentNode;
-      wrap.replaceChild(div, ta);
-      var counter = wrap.querySelector('.counter'); if(counter) counter.parentNode.removeChild(counter);
-    }
-
-    // Bangun halaman foto baru (2x2) dari data actual (bukan clone)
-    var photos = collectPhotosData();
-    var newPhotos = document.createElement('div');
-    newPhotos.className = 'photos';
-    // isi 4 slot (jika kosong, tampilkan placeholder kotak)
-    for (var s=0;s<4;s++){
-      var card = document.createElement('div');
-      card.className = 'photo-card';
-      card.style.background = '#fff'; card.style.color = '#111'; card.style.border='1px solid #ddd'; card.style.borderRadius='6px'; card.style.padding='12px';
-      // stage
-      var stage = document.createElement('div');
-      stage.className = 'photo-stage';
-      stage.style.border='1px solid #ccc'; stage.style.background='#fff'; stage.style.borderRadius='4px'; stage.style.display='grid'; stage.style.placeItems='center'; stage.style.overflow='hidden';
-      stage.style.height='420px'; /* 2x baris aman untuk 1 halaman */
-      if (photos[s] && photos[s].src){
-        var im = document.createElement('img');
-        im.src = photos[s].src;
-        im.style.maxWidth='100%'; im.style.maxHeight='100%'; im.style.objectFit='contain'; im.style.display='block';
-        stage.appendChild(im);
-      } else {
-        var sp = document.createElement('span'); sp.textContent = (getLang()==='en'?'No Photo':'Tidak ada foto');
-        sp.style.color='#555'; stage.appendChild(sp);
-      }
-      card.appendChild(stage);
-      // caption
-      var cap = document.createElement('div');
-      cap.className = 'photo-desc-print';
-      cap.textContent = (photos[s] && photos[s].desc) ? photos[s].desc : '';
-      cap.style.fontSize='12px'; cap.style.marginTop='8px';
-      card.appendChild(cap);
-      newPhotos.appendChild(card);
-    }
-
-    // Ganti section photos di clone dengan yg baru
-    var oldPhotos = clone.querySelector('.photos');
-    if (oldPhotos){
-      // sisipkan page-break explicit dari html2pdf
-      var br = document.createElement('div'); br.className = 'html2pdf__page-break';
-      oldPhotos.parentNode.insertBefore(br, oldPhotos);
-      oldPhotos.parentNode.replaceChild(newPhotos, oldPhotos);
-    }
-
-    // Style override khusus export (tanpa @media print; cegah page-break aneh)
-    var style = document.createElement('style');
-    style.textContent =
-      '#exportMount{position:fixed;left:-10000px;top:0;width:794px;z-index:-1}' + /* ~A4 width @96dpi */
-      '#exportRoot{width:794px;background:#fff;color:#111;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial}' +
-      '#exportRoot *{page-break-before:auto !important;page-break-inside:auto !important}' +
-      '#exportRoot .photos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:0}' +
-      '#exportRoot .photo-card{height:auto}';
-
-    // Mount ke dokumen (offscreen)
-    var mount = document.createElement('div'); mount.id='exportMount';
-    mount.appendChild(style); mount.appendChild(clone);
-    document.body.appendChild(mount);
-    return mount; // caller akan remove setelah render
-  }
-  function filenameFromMeta(){
-    var project = (qs('#inp-project').value || 'PROJECT').replace(/\s+/g,'_');
-    var date = (qs('#inp-date').value || (new Date().toISOString().slice(0,10)));
-    return 'MHC_' + project + '_' + date + '.pdf';
-  }
-  function buildPdfBlobForShare(){
-    return new Promise(function(resolve,reject){
-      if (typeof html2pdf==='undefined'){ return reject(new Error('html2pdf not loaded')); }
-      var mount = buildExportDOM();
-      var root = mount.querySelector('#exportRoot');
-      var opt = {
-        margin:[10,10,10,10],
-        image:{type:'jpeg',quality:0.92},
-        html2canvas:{scale:2,useCORS:true,allowTaint:true,background:'#ffffff'},
-        jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
-        pagebreak:{mode:['css']} // hanya honor .html2pdf__page-break
-      };
-      try{
-        var worker = html2pdf().set(opt).from(root).toPdf();
-        worker.get('pdf').then(function(pdf){
-          var blob = pdf.output('blob');
-          document.body.removeChild(mount);
-          resolve(blob);
-        }).catch(function(err){
-          document.body.removeChild(mount);
-          reject(err);
-        });
-      }catch(e){
-        document.body.removeChild(mount);
-        reject(e);
-      }
+  /* ==== PRINT & RESET ==== */
+  document.getElementById('printBtn').addEventListener('click', ()=>window.print());
+  document.getElementById('resetBtn').addEventListener('click', ()=>{
+    document.querySelectorAll('#chkTable input[type=radio]').forEach(r=>r.checked=false);
+    document.querySelectorAll('.remarks').forEach(t=>{ t.value=''; updateCounter(t); });
+    document.querySelectorAll('.photo-card').forEach(card=>{
+      card.querySelector('.photo-stage').innerHTML='<span>Tambahkan Foto</span>';
+      const f = card.querySelector('input[type=file]'); if(f) f.value='';
+      const d = card.querySelector('.photo-desc'); if(d){ d.value=''; }
+      const pb = card.querySelector('.photo-desc-print'); if(pb){ pb.textContent=''; }
     });
-  }
-
-  /* ===== WhatsApp Share ===== */
-  function shareViaWhatsApp(){
-    var btn = qs('#waBtn');
-    var oldHTML = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = (getLang()==='en' ? 'Preparing PDF…' : 'Menyiapkan PDF…');
-
-    buildPdfBlobForShare()
-      .then(function(blob){
-        var file;
-        try{ file = new File([blob], filenameFromMeta(), {type:'application/pdf', lastModified: Date.now()}); }
-        catch(e){ file = blob; file.name = filenameFromMeta(); file.type='application/pdf'; }
-
-        if (navigator.canShare && navigator.canShare({files:[file]})){
-          btn.innerHTML = (getLang()==='en' ? 'Opening WhatsApp…' : 'Membuka WhatsApp…');
-          return navigator.share({
-            files:[file],
-            title:'Material Handling Checklist',
-            text:(getLang()==='en' ? 'Material Handling Checklist (PDF attached).' : 'Material Handling Checklist (PDF terlampir).')
-          });
-        } else {
-          var url = URL.createObjectURL(blob);
-          var a=document.createElement('a'); a.href=url; a.download=filenameFromMeta(); a.click();
-          setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
-          var msgID='PDF telah diunduh. Silakan lampirkan file tersebut di WhatsApp.';
-          var msgEN='PDF downloaded. Please attach the file in WhatsApp.';
-          var message=encodeURIComponent(getLang()==='en'?msgEN:msgID);
-          var waUrl = (/Android/i.test(navigator.userAgent) ? 'https://wa.me/?text=' : 'https://web.whatsapp.com/send?text=') + message;
-          window.open(waUrl, '_blank');
-          alert(getLang()==='en'
-            ? 'Your browser cannot attach files directly to WhatsApp. The PDF has been downloaded—attach it from Files.'
-            : 'Browser Anda tidak bisa melampirkan file langsung ke WhatsApp. PDF sudah diunduh—lampirkan dari Files.');
-        }
-      })
-      .catch(function(err){
-        if (window.console && console.error) console.error(err);
-        alert(getLang()==='en'
-          ? 'Failed to generate or share the PDF. Try again, or use Print to save as PDF then share manually.'
-          : 'Gagal membuat atau membagikan PDF. Coba lagi, atau gunakan Print untuk simpan PDF lalu bagikan manual.');
-      })
-      .then(function(){ btn.innerHTML = oldHTML; btn.disabled = false; });
-  }
-  qs('#waBtn').addEventListener('click', shareViaWhatsApp, false);
-
-})();
+    refreshScores(); window.scrollTo({top:0,behavior:'smooth'});
+  });
 </script>
 </body>
 </html>
