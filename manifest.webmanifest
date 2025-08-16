@@ -1,0 +1,16 @@
+{
+  "name": "Material Handling Checklist",
+  "short_name": "MHC",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#111827",
+  "icons": [
+    {
+      "src": "https://mokhamadabrar.github.io/construction-inspection/Logo-JO.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
