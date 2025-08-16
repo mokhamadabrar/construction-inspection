@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Material Handling Checklist — Final v12</title>
+<title>Material Handling Checklist — Final v13</title>
 <style>
   :root{ --brand:#6a1b9a; --row:#f7f9fc; --header:#0ea5e9; --border:#d1d5db; --ok:#16a34a; --bad:#ef4444; --muted:#6b7280; }
   *{box-sizing:border-box}
@@ -85,7 +85,7 @@
   @media (max-width:800px){ .meta{grid-template-columns:repeat(2,1fr)} }
   @media (max-width:640px){ .photos{grid-template-columns:1fr} .col-no{width:64px} }
 
-  /* print (HANYA untuk window.print) */
+  /* print hanya untuk tombol Print (bukan untuk WA Share) */
   @page{size:A4 portrait;margin:12mm}
   @media print{
     .toolbar{display:none!important}
@@ -101,19 +101,9 @@
       -webkit-appearance:none; appearance:none;
     }
     .counter{display:none}
-    /* HALAMAN FOTO khusus (rapi 1 halaman, 2x2) */
-    .photos{
-      page-break-before: always;
-      grid-template-columns: 1fr 1fr;
-      gap: 6mm;
-      margin-top: 0;
-    }
-    .photo-card{
-      background:#fff; color:#111; border:1px solid #ddd; padding:5mm; border-radius:6px;
-      min-height:auto; height:120mm; /* 2 baris pas A4 (297mm - margin) */
-      break-inside: avoid; page-break-inside: avoid;
-    }
-    .photo-stage{ border:1px solid #ccc; background:#fff; border-radius:4px; }
+    .photos{page-break-before: always; grid-template-columns: 1fr 1fr; gap: 6mm; margin-top: 0}
+    .photo-card{background:#fff;color:#111;border:1px solid #ddd;padding:5mm;border-radius:6px;min-height:auto;height:120mm;break-inside:avoid;page-break-inside:avoid}
+    .photo-stage{ border:1px solid #ccc; background:#fff; border-radius:4px }
     .photo-actions{display:none}
     .photo-desc-print{ display:block; font-size:11px; color:#111; background:transparent; padding:0; margin-top:3mm }
     .footer{font-size:11px}
@@ -156,7 +146,7 @@
     <div class="label" data-i18n="label_contractor">Kontraktor</div><input id="inp-contractor" placeholder="Nama Kontraktor"/>
   </div>
 
-  <!-- Tabel Checklist (isi pertanyaan dari Anda, tidak diubah) -->
+  <!-- Tabel Checklist (sesuai skrip Anda) -->
   <table class="chk-table" id="chkTable">
     <thead>
       <tr>
@@ -171,7 +161,6 @@
     <!-- ===== SECTION A ===== -->
     <tbody data-section="A">
       <tr><td class="section-head" colspan="5">A. METHOD OF WORK PLAN</td></tr>
-
       <tr class="row-alt">
         <td class="col-no">A1</td>
         <td colspan="4"><div class="ques">Apakah penempatan material telah sesuai dengan lokasi pada MSRA, dan telah sesuai dengan persyaratan tempat penyimpanan?</div></td>
@@ -416,7 +405,7 @@
     <div>Application Design by <b>Abrar (T&amp;T)</b> @ 2025</div>
   </div>
 
-  <!-- Photos (halaman khusus saat cetak) -->
+  <!-- Photos (layar) -->
   <div class="photos" id="photos">
     <div class="photo-card" data-slot="1">
       <div class="photo-stage"><span>Tambahkan Foto</span></div>
@@ -465,16 +454,16 @@
 
 <script>
 (function(){
-  /* ===== Helpers ===== */
+  /* ===== helpers ===== */
   function qsa(sel, root){ return (root||document).querySelectorAll(sel); }
   function qs(sel, root){ return (root||document).querySelector(sel); }
 
-  /* ===== Language state ===== */
+  /* ===== language ===== */
   var currentLang = 'id';
   try { currentLang = (localStorage.getItem('mhc_lang') === 'en') ? 'en' : 'id'; } catch(e){}
   function getLang(){ return currentLang; }
 
-  /* ===== Scoring ===== */
+  /* ===== scoring ===== */
   function scoreSection(sec){
     var names = {}, radios = qsa('input[type=radio]', sec);
     for (var i=0;i<radios.length;i++){ names[radios[i].name] = true; }
@@ -519,7 +508,7 @@
   for (var r=0;r<radiosAll.length;r++){ radiosAll[r].addEventListener('change', refreshScores, false); }
   refreshScores();
 
-  /* ===== Limits ===== */
+  /* ===== limits ===== */
   function enforceMaxWithAlert(el, MAX, fieldName){
     if (el.value.length > MAX){
       el.value = el.value.slice(0, MAX);
@@ -532,7 +521,7 @@
     return false;
   }
 
-  /* ===== Remarks (70) ===== */
+  /* ===== remarks (70) ===== */
   var MAX_REMARKS = 70;
   function updateCounter(area){
     var wrap = area.closest('.remarks-wrap');
@@ -551,7 +540,7 @@
     })(remarkAreas[i]);
   }
 
-  /* ===== Photos (58) ===== */
+  /* ===== photos (58) ===== */
   var MAX_DESC = 58;
   var photoFileInputs = qsa('.photo-card input[type=file]');
   for (i=0;i<photoFileInputs.length;i++){
@@ -665,94 +654,130 @@
     refreshScores(); window.scrollTo(0,0);
   }, false);
 
-  /* ===== PDF EXPORT (khusus WhatsApp) =====
-     - Clone .page ke container offscreen
-     - Ubah textarea -> div (preserve newline)
-     - Paksa lembar foto jadi 1 halaman (2x2, tinggi hitung otomatis)
-     - Jangan pakai @media print (hindari halaman kosong) */
-  function buildShareClone(){
+  /* ===== Export builder (fix halaman kosong & foto 1 halaman) ===== */
+  function collectPhotosData(){
+    var out = [];
+    var cards = qsa('#photos .photo-card');
+    for (var i=0;i<cards.length;i++){
+      var imgEl = qs('.photo-stage img', cards[i]);
+      var descEl = qs('.photo-desc', cards[i]);
+      out.push({
+        src: imgEl ? imgEl.src : null,
+        desc: descEl ? (descEl.value || '') : ''
+      });
+    }
+    return out;
+  }
+  function buildExportDOM(){
+    // clone konten utama
     var src = qs('#appRoot');
     var clone = src.cloneNode(true);
     clone.id = 'exportRoot';
 
-    // 1) Bersihkan toolbar di clone
+    // Hilangkan toolbar di clone
     var tb = clone.querySelector('.toolbar'); if (tb) tb.parentNode.removeChild(tb);
 
-    // 2) Ubah textarea -> div plain text
+    // Ubah textarea remarks -> div teks biasa
     var tas = clone.querySelectorAll('textarea.remarks');
     for (var i=0;i<tas.length;i++){
       var ta = tas[i];
       var val = ta.value || '';
       var div = document.createElement('div');
-      div.style.cssText = 'border:1px solid #d1d5db;border-radius:6px;padding:6px 8px;font-size:12px;white-space:pre-wrap;min-height:18px';
+      div.style.cssText='border:1px solid #d1d5db;border-radius:6px;padding:6px 8px;font-size:12px;white-space:pre-wrap;min-height:18px;background:#fff';
       div.textContent = val;
       var wrap = ta.parentNode;
       wrap.replaceChild(div, ta);
       var counter = wrap.querySelector('.counter'); if(counter) counter.parentNode.removeChild(counter);
     }
 
-    // 3) Foto: sembunyikan input, tampilkan caption print
-    var cards = clone.querySelectorAll('.photo-card');
-    for (var j=0;j<cards.length;j++){
-      var c = cards[j];
-      var actions = c.querySelector('.photo-actions'); if(actions) actions.style.display='none';
-      var printDesc = c.querySelector('.photo-desc-print'); if(printDesc) printDesc.style.cssText='display:block;font-size:11px;color:#111;margin-top:6px';
-      var stage = c.querySelector('.photo-stage');
-      stage.style.border='1px solid #ccc'; stage.style.background='#fff';
+    // Bangun halaman foto baru (2x2) dari data actual (bukan clone)
+    var photos = collectPhotosData();
+    var newPhotos = document.createElement('div');
+    newPhotos.className = 'photos';
+    // isi 4 slot (jika kosong, tampilkan placeholder kotak)
+    for (var s=0;s<4;s++){
+      var card = document.createElement('div');
+      card.className = 'photo-card';
+      card.style.background = '#fff'; card.style.color = '#111'; card.style.border='1px solid #ddd'; card.style.borderRadius='6px'; card.style.padding='12px';
+      // stage
+      var stage = document.createElement('div');
+      stage.className = 'photo-stage';
+      stage.style.border='1px solid #ccc'; stage.style.background='#fff'; stage.style.borderRadius='4px'; stage.style.display='grid'; stage.style.placeItems='center'; stage.style.overflow='hidden';
+      stage.style.height='420px'; /* 2x baris aman untuk 1 halaman */
+      if (photos[s] && photos[s].src){
+        var im = document.createElement('img');
+        im.src = photos[s].src;
+        im.style.maxWidth='100%'; im.style.maxHeight='100%'; im.style.objectFit='contain'; im.style.display='block';
+        stage.appendChild(im);
+      } else {
+        var sp = document.createElement('span'); sp.textContent = (getLang()==='en'?'No Photo':'Tidak ada foto');
+        sp.style.color='#555'; stage.appendChild(sp);
+      }
+      card.appendChild(stage);
+      // caption
+      var cap = document.createElement('div');
+      cap.className = 'photo-desc-print';
+      cap.textContent = (photos[s] && photos[s].desc) ? photos[s].desc : '';
+      cap.style.fontSize='12px'; cap.style.marginTop='8px';
+      card.appendChild(cap);
+      newPhotos.appendChild(card);
     }
 
-    // 4) Sisipkan style khusus export (hindari halaman kosong & pastikan 1 halaman foto)
+    // Ganti section photos di clone dengan yg baru
+    var oldPhotos = clone.querySelector('.photos');
+    if (oldPhotos){
+      // sisipkan page-break explicit dari html2pdf
+      var br = document.createElement('div'); br.className = 'html2pdf__page-break';
+      oldPhotos.parentNode.insertBefore(br, oldPhotos);
+      oldPhotos.parentNode.replaceChild(newPhotos, oldPhotos);
+    }
+
+    // Style override khusus export (tanpa @media print; cegah page-break aneh)
     var style = document.createElement('style');
     style.textContent =
-      'body{background:#fff!important}' +
-      '#exportMount{position:fixed;left:-99999px;top:0;width:210mm;}' + /* lebar A4 potrait */
-      '#exportRoot .photos{page-break-before:always;display:grid;grid-template-columns:1fr 1fr;gap:6mm;margin-top:0}' +
-      '#exportRoot .photo-card{background:#fff;color:#111;border:1px solid #ddd;padding:5mm;border-radius:6px;height:120mm;min-height:auto;break-inside:avoid;page-break-inside:avoid}' +
-      '#exportRoot .photo-stage{border:1px solid #ccc;background:#fff;border-radius:4px}' +
-      '#exportRoot .photo-desc-print{display:block;font-size:11px;color:#111;background:transparent;padding:0;margin-top:3mm}' +
-      '#exportRoot textarea{display:none!important}';
-    return { clone: clone, style: style };
-  }
+      '#exportMount{position:fixed;left:-10000px;top:0;width:794px;z-index:-1}' + /* ~A4 width @96dpi */
+      '#exportRoot{width:794px;background:#fff;color:#111;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial}' +
+      '#exportRoot *{page-break-before:auto !important;page-break-inside:auto !important}' +
+      '#exportRoot .photos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:0}' +
+      '#exportRoot .photo-card{height:auto}';
 
+    // Mount ke dokumen (offscreen)
+    var mount = document.createElement('div'); mount.id='exportMount';
+    mount.appendChild(style); mount.appendChild(clone);
+    document.body.appendChild(mount);
+    return mount; // caller akan remove setelah render
+  }
   function filenameFromMeta(){
     var project = (qs('#inp-project').value || 'PROJECT').replace(/\s+/g,'_');
     var date = (qs('#inp-date').value || (new Date().toISOString().slice(0,10)));
     return 'MHC_' + project + '_' + date + '.pdf';
   }
-
   function buildPdfBlobForShare(){
     return new Promise(function(resolve,reject){
       if (typeof html2pdf==='undefined'){ return reject(new Error('html2pdf not loaded')); }
-
-      // Mount offscreen
-      var pack = buildShareClone();
-      var mount = document.createElement('div'); mount.id='exportMount';
-      mount.appendChild(pack.style);
-      mount.appendChild(pack.clone);
-      document.body.appendChild(mount);
-
-      // Pastikan logo aman; kalau error rendering, sembunyikan
-      var logo = pack.clone.querySelector('.logo-wrap img');
-      var tryRender = function(hideLogo){
-        if (hideLogo && logo) logo.style.visibility='hidden';
-        var opt = {
-          margin:[10,10,10,10],
-          image:{type:'jpeg',quality:0.92},
-          html2canvas:{scale:2,useCORS:true,allowTaint:true,background:'#ffffff'},
-          jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
-          pagebreak:{mode:['css','legacy'], avoid: ['.photo-card','.score-card','.section-head']}
-        };
-        var worker = html2pdf().set(opt).from(pack.clone).toPdf();
+      var mount = buildExportDOM();
+      var root = mount.querySelector('#exportRoot');
+      var opt = {
+        margin:[10,10,10,10],
+        image:{type:'jpeg',quality:0.92},
+        html2canvas:{scale:2,useCORS:true,allowTaint:true,background:'#ffffff'},
+        jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+        pagebreak:{mode:['css']} // hanya honor .html2pdf__page-break
+      };
+      try{
+        var worker = html2pdf().set(opt).from(root).toPdf();
         worker.get('pdf').then(function(pdf){
           var blob = pdf.output('blob');
           document.body.removeChild(mount);
           resolve(blob);
         }).catch(function(err){
-          if (!hideLogo){ tryRender(true); }
-          else { document.body.removeChild(mount); reject(err); }
+          document.body.removeChild(mount);
+          reject(err);
         });
-      };
-      tryRender(false);
+      }catch(e){
+        document.body.removeChild(mount);
+        reject(e);
+      }
     });
   }
 
@@ -796,15 +821,9 @@
           ? 'Failed to generate or share the PDF. Try again, or use Print to save as PDF then share manually.'
           : 'Gagal membuat atau membagikan PDF. Coba lagi, atau gunakan Print untuk simpan PDF lalu bagikan manual.');
       })
-      .then(function(){  /* finally */
-        btn.innerHTML = oldHTML;
-        btn.disabled = false;
-      });
+      .then(function(){ btn.innerHTML = oldHTML; btn.disabled = false; });
   }
-
-  /* ===== Bind Buttons ===== */
   qs('#waBtn').addEventListener('click', shareViaWhatsApp, false);
-  qs('#printBtn').addEventListener('click', function(){ window.print(); }, false);
 
 })();
 </script>
