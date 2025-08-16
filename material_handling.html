@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Material Handling Checklist — Final v6 (fix i18n)</title>
+<title>Material Handling Checklist — Final v7</title>
 <style>
   :root{
     --brand:#6a1b9a; --row:#f7f9fc; --header:#0ea5e9; --border:#d1d5db;
@@ -87,11 +87,16 @@
   .photo-desc{flex:1;min-width:120px;border:none;border-radius:8px;padding:6px 8px;font-size:12px}
   .photo-desc-print{display:none;margin-top:6px;font-size:12px;line-height:1.3;background:rgba(255,255,255,.12);padding:4px 6px;border-radius:6px}
 
+  /* footer */
+  .footer{margin-top:14px;text-align:center;font-size:12px;color:#374151}
+  .footer .line{height:1px;background:var(--border);margin:10px 0}
+  .footer b{color:#111827}
+
   /* responsive */
   @media (max-width:800px){ .meta{grid-template-columns:repeat(2,1fr)} }
   @media (max-width:640px){ .photos{grid-template-columns:1fr} .col-no{width:64px} }
 
-  /* print: A4, remarks printed as text; photos on dedicated page */
+  /* print */
   @page{size:A4 portrait;margin:12mm}
   @media print{
     .toolbar{display:none!important}
@@ -108,9 +113,10 @@
     }
     .counter{display:none}
 
+    /* Photos page dedicated */
     .photos{
       page-break-before: always;
-      page-break-after: always;
+      page-break-after: always;  /* akhir dokumen: umumnya tidak menambah halaman kosong */
       grid-template-columns: 1fr 1fr;
       gap: 6mm;
       margin-top: 0;
@@ -125,6 +131,8 @@
     .photo-stage{ border:1px solid #ccc; background:#fff; border-radius:4px; }
     .photo-actions{display:none}
     .photo-desc-print{ display:block; font-size:11px; color:#111; background:transparent; padding:0; margin-top:3mm }
+
+    .footer{font-size:11px}
   }
 </style>
 </head>
@@ -153,11 +161,13 @@
     </button>
   </div>
 
+  <!-- Meta (tambah Kontraktor) -->
   <div class="meta">
     <div class="label" data-i18n="label_site">Site Assesssor</div><input id="inp-assessor" placeholder="Nama Site Assesssor"/>
     <div class="label" data-i18n="label_project">Project</div><input id="inp-project" value="JKT09" placeholder="Kode/Nama"/>
     <div class="label" data-i18n="label_date">Date</div><input id="inp-date" type="date"/>
     <div class="label" data-i18n="label_location">Location</div><input id="inp-location" placeholder="Lokasi"/>
+    <div class="label" data-i18n="label_contractor">Kontraktor</div><input id="inp-contractor" placeholder="Nama Kontraktor"/>
   </div>
 
   <table class="chk-table" id="chkTable">
@@ -411,7 +421,15 @@
     <div class="score-card"><h4>Total Score <span id="badge" class="badge">0/100</span></h4><div class="score-val" id="totalScore">0%</div></div>
   </div>
 
-  <!-- Photos -->
+  <!-- Footer (diletakkan sebelum halaman Foto saat print) -->
+  <div class="footer" role="contentinfo">
+    <div class="line"></div>
+    <div>Created &amp; Review by</div>
+    <div><b>Tan Vee Meng</b> (JO Safety Director) &amp; <b>Mokhamad Abrar</b> (T&amp;T Safety Advisor)</div>
+    <div>Application Design by <b>Abrar (T&amp;T)</b> @ 2025</div>
+  </div>
+
+  <!-- Photos (akan menjadi halaman tersendiri saat print) -->
   <div class="photos" id="photos">
     <div class="photo-card" data-slot="1">
       <div class="photo-stage"><span>Tambahkan Foto</span></div>
@@ -454,9 +472,9 @@
 </div>
 
 <script>
-  /* ==== LANGUAGE STATE (moved to TOP) ==== */
+  /* ==== LANGUAGE STATE ==== */
   let currentLang = (localStorage.getItem('mhc_lang') === 'en') ? 'en' : 'id';
-  const getLang = () => currentLang; // safe accessor
+  const getLang = () => currentLang;
 
   /* ==== SCORING ==== */
   function scoreSection(sec){
@@ -577,7 +595,7 @@
   }
   const qMap = getQuestionMap();
 
-  // baseline ID dari DOM
+  // baseline ID dari DOM (teks pertanyaan tidak diubah)
   const baselineID = {};
   Object.keys(qMap).forEach(k => baselineID[k] = qMap[k].textContent.trim());
 
@@ -589,6 +607,7 @@
         label_project: "Project",
         label_date: "Date",
         label_location: "Location",
+        label_contractor: "Kontraktor",
         th_no: "No.",
         th_question: "Pertanyaan",
         th_yes: "YES",
@@ -597,6 +616,7 @@
         ph_assessor: "Nama Site Assesssor",
         ph_project: "Kode/Nama",
         ph_location: "Lokasi",
+        ph_contractor: "Nama Kontraktor",
         ph_remarks: "Remarks (maks 70 karakter)…",
         ph_photo: "Deskripsi foto (maks 58)…",
         radio_yes: "Ya",
@@ -611,6 +631,7 @@
         label_project: "Project",
         label_date: "Date",
         label_location: "Location",
+        label_contractor: "Contractor",
         th_no: "No.",
         th_question: "Question",
         th_yes: "YES",
@@ -619,6 +640,7 @@
         ph_assessor: "Site assessor name",
         ph_project: "Code/Name",
         ph_location: "Location",
+        ph_contractor: "Contractor name",
         ph_remarks: "Remarks (max 70 characters)…",
         ph_photo: "Photo description (max 58)…",
         radio_yes: "Yes",
@@ -649,6 +671,7 @@
     document.getElementById('inp-assessor').placeholder = i18n[lang].labels.ph_assessor;
     document.getElementById('inp-project').placeholder  = i18n[lang].labels.ph_project;
     document.getElementById('inp-location').placeholder = i18n[lang].labels.ph_location;
+    document.getElementById('inp-contractor').placeholder = i18n[lang].labels.ph_contractor;
     document.querySelectorAll('textarea.remarks').forEach(t=> t.placeholder = i18n[lang].labels.ph_remarks);
     document.querySelectorAll('.photo-desc').forEach(p=> p.placeholder = i18n[lang].labels.ph_photo);
   }
