@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Material Handling Checklist — Final v11</title>
+<title>Material Handling Checklist — Final v12</title>
 <style>
   :root{ --brand:#6a1b9a; --row:#f7f9fc; --header:#0ea5e9; --border:#d1d5db; --ok:#16a34a; --bad:#ef4444; --muted:#6b7280; }
   *{box-sizing:border-box}
@@ -58,7 +58,7 @@
   .badge{border-radius:999px;padding:3px 8px;font-size:11px;margin-left:8px;color:#fff;background:#111827}
   .good{background:var(--ok)!important} .bad{background:var(--bad)!important}
 
-  /* photos */
+  /* photos (layar) */
   .photos{display:grid;gap:12px;grid-template-columns:repeat(2,1fr);margin-top:10px}
   .photo-card{background:#4f81bd;border-radius:14px;padding:10px;color:#fff;min-height:210px;display:flex;flex-direction:column;gap:8px;break-inside:avoid}
   .photo-stage{flex:1;border:2px dashed rgba(255,255,255,.7);border-radius:12px;display:grid;place-items:center;overflow:hidden;background:rgba(255,255,255,.06)}
@@ -85,7 +85,7 @@
   @media (max-width:800px){ .meta{grid-template-columns:repeat(2,1fr)} }
   @media (max-width:640px){ .photos{grid-template-columns:1fr} .col-no{width:64px} }
 
-  /* print: A4, remarks printed as text; photos on dedicated page */
+  /* print (HANYA untuk window.print) */
   @page{size:A4 portrait;margin:12mm}
   @media print{
     .toolbar{display:none!important}
@@ -101,21 +101,17 @@
       -webkit-appearance:none; appearance:none;
     }
     .counter{display:none}
-
-    /* Photos: 1 halaman khusus */
+    /* HALAMAN FOTO khusus (rapi 1 halaman, 2x2) */
     .photos{
       page-break-before: always;
-      page-break-after: always;
       grid-template-columns: 1fr 1fr;
       gap: 6mm;
       margin-top: 0;
     }
     .photo-card{
-      background:#fff; color:#111;
-      border:1px solid #ddd; padding:5mm; border-radius:6px;
-      min-height:120mm;
-      break-inside: avoid;
-      page-break-inside: avoid;
+      background:#fff; color:#111; border:1px solid #ddd; padding:5mm; border-radius:6px;
+      min-height:auto; height:120mm; /* 2 baris pas A4 (297mm - margin) */
+      break-inside: avoid; page-break-inside: avoid;
     }
     .photo-stage{ border:1px solid #ccc; background:#fff; border-radius:4px; }
     .photo-actions{display:none}
@@ -125,7 +121,7 @@
 </style>
 </head>
 <body>
-<div class="page">
+<div class="page" id="appRoot">
   <div class="title">MATERIAL HANDLING CHECKLIST</div>
 
   <!-- LOGO -->
@@ -151,7 +147,7 @@
     </button>
   </div>
 
-  <!-- Meta (termasuk Kontraktor) -->
+  <!-- Meta -->
   <div class="meta">
     <div class="label" data-i18n="label_site">Site Assesssor</div><input id="inp-assessor" placeholder="Nama Site Assesssor"/>
     <div class="label" data-i18n="label_project">Project</div><input id="inp-project" value="JKT09" placeholder="Kode/Nama"/>
@@ -160,6 +156,7 @@
     <div class="label" data-i18n="label_contractor">Kontraktor</div><input id="inp-contractor" placeholder="Nama Kontraktor"/>
   </div>
 
+  <!-- Tabel Checklist (isi pertanyaan dari Anda, tidak diubah) -->
   <table class="chk-table" id="chkTable">
     <thead>
       <tr>
@@ -468,20 +465,7 @@
 
 <script>
 (function(){
-  /* ===== Polyfills ===== */
-  if (!Element.prototype.matches) {
-    Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
-  }
-  if (!Element.prototype.closest) {
-    Element.prototype.closest = function(selector) {
-      var el = this;
-      while (el && el.nodeType === 1) {
-        if (el.matches(selector)) return el;
-        el = el.parentElement || el.parentNode;
-      }
-      return null;
-    };
-  }
+  /* ===== Helpers ===== */
   function qsa(sel, root){ return (root||document).querySelectorAll(sel); }
   function qs(sel, root){ return (root||document).querySelector(sel); }
 
@@ -540,8 +524,8 @@
     if (el.value.length > MAX){
       el.value = el.value.slice(0, MAX);
       var msg = (getLang()==='en')
-        ? ('Maximum ' + MAX + ' characters for ' + fieldName + '. Text has been truncated to meet the requirement.')
-        : ('Maksimal ' + MAX + ' karakter untuk ' + fieldName + '. Teks telah dipotong agar sesuai ketentuan.');
+        ? ('Maximum ' + MAX + ' characters for ' + fieldName + '. Text has been truncated.')
+        : ('Maksimal ' + MAX + ' karakter untuk ' + fieldName + '. Teks dipotong.');
       alert(msg);
       return true;
     }
@@ -573,7 +557,8 @@
   for (i=0;i<photoFileInputs.length;i++){
     photoFileInputs[i].addEventListener('change', function(e){
       var file = e.target.files[0]; if(!file) return;
-      var stage = e.target.closest('.photo-card').querySelector('.photo-stage');
+      var card = e.target.closest('.photo-card');
+      var stage = card.querySelector('.photo-stage');
       var img = document.createElement('img');
       var rd = new FileReader();
       rd.onload = function(ev){ stage.innerHTML=''; img.src = ev.target.result; stage.appendChild(img); };
@@ -602,8 +587,7 @@
     return map;
   }
   var qMap = getQuestionMap();
-  var baselineID = {};
-  for (var key in qMap){ if (qMap.hasOwnProperty(key)) baselineID[key] = qMap[key].textContent.trim(); }
+  var baselineID = {}; for (var key in qMap){ if (qMap.hasOwnProperty(key)) baselineID[key] = qMap[key].textContent.trim(); }
   var i18n = {
     id:{labels:{label_site:"Site Assesssor",label_project:"Project",label_date:"Date",label_location:"Location",label_contractor:"Kontraktor",
       th_no:"No.",th_question:"Pertanyaan",th_yes:"YES",th_no2:"NO",th_na:"N/A",
@@ -681,42 +665,94 @@
     refreshScores(); window.scrollTo(0,0);
   }, false);
 
-  /* ===== PDF builder ===== */
+  /* ===== PDF EXPORT (khusus WhatsApp) =====
+     - Clone .page ke container offscreen
+     - Ubah textarea -> div (preserve newline)
+     - Paksa lembar foto jadi 1 halaman (2x2, tinggi hitung otomatis)
+     - Jangan pakai @media print (hindari halaman kosong) */
+  function buildShareClone(){
+    var src = qs('#appRoot');
+    var clone = src.cloneNode(true);
+    clone.id = 'exportRoot';
+
+    // 1) Bersihkan toolbar di clone
+    var tb = clone.querySelector('.toolbar'); if (tb) tb.parentNode.removeChild(tb);
+
+    // 2) Ubah textarea -> div plain text
+    var tas = clone.querySelectorAll('textarea.remarks');
+    for (var i=0;i<tas.length;i++){
+      var ta = tas[i];
+      var val = ta.value || '';
+      var div = document.createElement('div');
+      div.style.cssText = 'border:1px solid #d1d5db;border-radius:6px;padding:6px 8px;font-size:12px;white-space:pre-wrap;min-height:18px';
+      div.textContent = val;
+      var wrap = ta.parentNode;
+      wrap.replaceChild(div, ta);
+      var counter = wrap.querySelector('.counter'); if(counter) counter.parentNode.removeChild(counter);
+    }
+
+    // 3) Foto: sembunyikan input, tampilkan caption print
+    var cards = clone.querySelectorAll('.photo-card');
+    for (var j=0;j<cards.length;j++){
+      var c = cards[j];
+      var actions = c.querySelector('.photo-actions'); if(actions) actions.style.display='none';
+      var printDesc = c.querySelector('.photo-desc-print'); if(printDesc) printDesc.style.cssText='display:block;font-size:11px;color:#111;margin-top:6px';
+      var stage = c.querySelector('.photo-stage');
+      stage.style.border='1px solid #ccc'; stage.style.background='#fff';
+    }
+
+    // 4) Sisipkan style khusus export (hindari halaman kosong & pastikan 1 halaman foto)
+    var style = document.createElement('style');
+    style.textContent =
+      'body{background:#fff!important}' +
+      '#exportMount{position:fixed;left:-99999px;top:0;width:210mm;}' + /* lebar A4 potrait */
+      '#exportRoot .photos{page-break-before:always;display:grid;grid-template-columns:1fr 1fr;gap:6mm;margin-top:0}' +
+      '#exportRoot .photo-card{background:#fff;color:#111;border:1px solid #ddd;padding:5mm;border-radius:6px;height:120mm;min-height:auto;break-inside:avoid;page-break-inside:avoid}' +
+      '#exportRoot .photo-stage{border:1px solid #ccc;background:#fff;border-radius:4px}' +
+      '#exportRoot .photo-desc-print{display:block;font-size:11px;color:#111;background:transparent;padding:0;margin-top:3mm}' +
+      '#exportRoot textarea{display:none!important}';
+    return { clone: clone, style: style };
+  }
+
   function filenameFromMeta(){
     var project = (qs('#inp-project').value || 'PROJECT').replace(/\s+/g,'_');
     var date = (qs('#inp-date').value || (new Date().toISOString().slice(0,10)));
     return 'MHC_' + project + '_' + date + '.pdf';
   }
-  function expandRemarksForExport(){
-    var areas=qsa('textarea.remarks'), original=[];
-    for (var i=0;i<areas.length;i++){
-      var a=areas[i]; original.push([a,a.style.height,a.style.overflow]);
-      a.style.height='auto'; a.style.overflow='visible'; a.style.height=a.scrollHeight+'px';
-    }
-    return function(){ for (var j=0;j<original.length;j++){ var rec=original[j]; rec[0].style.height=rec[1]||''; rec[0].style.overflow=rec[2]||''; } };
-  }
-  function buildPdfBlobSafe(){
+
+  function buildPdfBlobForShare(){
     return new Promise(function(resolve,reject){
       if (typeof html2pdf==='undefined'){ return reject(new Error('html2pdf not loaded')); }
-      var el=qs('.page');
-      var opt={ margin:[10,10,10,10], image:{type:'jpeg',quality:0.92}, html2canvas:{scale:2,useCORS:true,allowTaint:true,background:'#ffffff'}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy']} };
-      var toolbar=qs('.toolbar'), logo=qs('.logo-wrap img');
-      var restore=expandRemarksForExport(); var prevVis=toolbar.style.visibility; toolbar.style.visibility='hidden';
-      var worker;
-      try{
-        worker = html2pdf().set(opt).from(el).toPdf();
+
+      // Mount offscreen
+      var pack = buildShareClone();
+      var mount = document.createElement('div'); mount.id='exportMount';
+      mount.appendChild(pack.style);
+      mount.appendChild(pack.clone);
+      document.body.appendChild(mount);
+
+      // Pastikan logo aman; kalau error rendering, sembunyikan
+      var logo = pack.clone.querySelector('.logo-wrap img');
+      var tryRender = function(hideLogo){
+        if (hideLogo && logo) logo.style.visibility='hidden';
+        var opt = {
+          margin:[10,10,10,10],
+          image:{type:'jpeg',quality:0.92},
+          html2canvas:{scale:2,useCORS:true,allowTaint:true,background:'#ffffff'},
+          jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+          pagebreak:{mode:['css','legacy'], avoid: ['.photo-card','.score-card','.section-head']}
+        };
+        var worker = html2pdf().set(opt).from(pack.clone).toPdf();
         worker.get('pdf').then(function(pdf){
-          var blob=pdf.output('blob'); restore(); toolbar.style.visibility=prevVis||''; resolve(blob);
-        }).catch(function(){
-          if(logo) logo.style.visibility='hidden';
-          worker = html2pdf().set(opt).from(el).toPdf();
-          worker.get('pdf').then(function(pdf2){
-            var blob2=pdf2.output('blob'); if(logo) logo.style.visibility=''; restore(); toolbar.style.visibility=prevVis||''; resolve(blob2);
-          }).catch(function(err2){
-            if(logo) logo.style.visibility=''; restore(); toolbar.style.visibility=prevVis||''; reject(err2);
-          });
+          var blob = pdf.output('blob');
+          document.body.removeChild(mount);
+          resolve(blob);
+        }).catch(function(err){
+          if (!hideLogo){ tryRender(true); }
+          else { document.body.removeChild(mount); reject(err); }
         });
-      }catch(e){ restore(); toolbar.style.visibility=prevVis||''; reject(e); }
+      };
+      tryRender(false);
     });
   }
 
@@ -727,7 +763,7 @@
     btn.disabled = true;
     btn.innerHTML = (getLang()==='en' ? 'Preparing PDF…' : 'Menyiapkan PDF…');
 
-    buildPdfBlobSafe()
+    buildPdfBlobForShare()
       .then(function(blob){
         var file;
         try{ file = new File([blob], filenameFromMeta(), {type:'application/pdf', lastModified: Date.now()}); }
@@ -760,15 +796,16 @@
           ? 'Failed to generate or share the PDF. Try again, or use Print to save as PDF then share manually.'
           : 'Gagal membuat atau membagikan PDF. Coba lagi, atau gunakan Print untuk simpan PDF lalu bagikan manual.');
       })
-      .then(function(){  /* acts like finally */
+      .then(function(){  /* finally */
         btn.innerHTML = oldHTML;
         btn.disabled = false;
       });
   }
-  qs('#waBtn').addEventListener('click', shareViaWhatsApp, false);
 
-  /* ===== Reset safety ===== */
-  try{}catch(e){ alert('Inisialisasi gagal: ' + e.message); }
+  /* ===== Bind Buttons ===== */
+  qs('#waBtn').addEventListener('click', shareViaWhatsApp, false);
+  qs('#printBtn').addEventListener('click', function(){ window.print(); }, false);
+
 })();
 </script>
 </body>
