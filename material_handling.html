@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Material Handling Checklist — Final</title>
+<title>Material Handling Checklist — Final v2</title>
 <style>
   :root{
     --brand:#6a1b9a; --row:#f7f9fc; --header:#0ea5e9; --border:#d1d5db;
@@ -12,7 +12,17 @@
   *{box-sizing:border-box}
   body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;margin:0;color:#111827;background:#fff}
   .page{max-width:1050px;margin:16px auto;padding:16px}
-  .title{color:var(--brand);text-align:center;font-weight:800;font-size:clamp(18px,4vw,28px);margin:0 0 10px}
+  .title{color:var(--brand);text-align:center;font-weight:800;font-size:clamp(18px,4vw,28px);margin:0 0 6px}
+
+  /* LOGO */
+  .logo-wrap{display:flex;justify-content:center;align-items:center;margin:6px 0 12px}
+  .logo-wrap img{
+    width:min(40vw,260px);   /* proporsional & dinamis */
+    height:auto;
+    max-height:120px;
+  }
+  .logo-caption{font-size:12px;color:#374151;text-align:center;margin-top:4px}
+
   .meta{display:grid;gap:8px 16px;grid-template-columns:repeat(6,1fr);font-size:13px;margin-bottom:8px}
   .meta .label{color:var(--muted)}
   .meta input{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px}
@@ -29,9 +39,22 @@
   .yn{display:flex;gap:10px;align-items:center}
   .yn label{display:flex;gap:6px;align-items:center;font-size:13px}
   .yn input{width:18px;height:18px}
+
   .remarks{width:100%;min-height:40px;border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:12px;resize:vertical}
-  .subrow td{border-top:none;padding-top:4px;padding-bottom:10px}
-  .remarks-cell{padding:6px 8px 10px}
+  .subrow td{border-top:none;padding-top:4px;padding-bottom:8px}
+  .remarks-cell{padding:6px 8px 6px}
+
+  /* counter & warning */
+  .remarks-wrap{display:flex;flex-direction:column;gap:4px}
+  .counter{font-size:11px;color:#6b7280}
+  .counter.limit{color:var(--bad);font-weight:700}
+  .note-pop{
+    position:fixed; left:50%; bottom:14px; transform:translateX(-50%);
+    background:#111827; color:#fff; padding:8px 12px; border-radius:999px;
+    font-size:12px; box-shadow:0 6px 14px rgba(0,0,0,.18); opacity:0; pointer-events:none;
+    transition:opacity .25s ease-out;
+  }
+  .note-pop.show{opacity:1}
 
   /* scores */
   .scores{display:grid;gap:10px;grid-template-columns:repeat(5,1fr);margin:12px 0 6px}
@@ -62,26 +85,30 @@
     .photo-card{min-height:150px}
     .chk-table td{padding:6px}
     .score-val{font-size:16px}
-    /* ----- ensure textarea content prints fully ----- */
+    .logo-caption{display:none}
+    /* ensure textarea content prints fully */
     textarea.remarks{
-      border:none !important;
-      outline:none !important;
-      resize:none !important;
-      overflow:visible !important;
-      white-space:pre-wrap !important; /* keep line breaks */
-      font-size:12px !important;
-      background:transparent !important;
-      height:auto !important;
-      min-height:unset !important;
-      -webkit-appearance:none;
-      appearance:none;
+      border:none !important; outline:none !important; resize:none !important;
+      overflow:visible !important; white-space:pre-wrap !important;
+      font-size:12px !important; background:transparent !important;
+      height:auto !important; min-height:unset !important;
+      -webkit-appearance:none; appearance:none;
     }
+    .counter{display:none}
   }
 </style>
 </head>
 <body>
 <div class="page">
   <div class="title">MATERIAL HANDLING CHECKLIST</div>
+
+  <!-- LOGO -->
+  <div class="logo-wrap" aria-label="Logo PT Jaya Obayashi">
+    <div>
+      <img src="https://mokhamadabrar.github.io/construction-inspection/Logo-JO.png" alt="PT Jaya Obayashi" />
+      <div class="logo-caption">PT Jaya Obayashi</div>
+    </div>
+  </div>
 
   <div class="meta">
     <div class="label">Inspector</div><input placeholder="Nama inspector"/>
@@ -119,7 +146,12 @@
             <label><input type="radio" name="A1" value="na"> N/A</label>
           </div>
         </td>
-        <td colspan="3" class="remarks-cell"><textarea class="remarks" placeholder="Remarks (opsional)…"></textarea></td>
+        <td colspan="3" class="remarks-cell">
+          <div class="remarks-wrap">
+            <textarea class="remarks" maxlength="70" placeholder="Remarks (maks 70 karakter)…"></textarea>
+            <div class="counter">0/70</div>
+          </div>
+        </td>
       </tr>
 
       <!-- A2 -->
@@ -134,7 +166,12 @@
           <label><input type="radio" name="A2" value="no"> Tidak</label>
           <label><input type="radio" name="A2" value="na"> N/A</label>
         </div></td>
-        <td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td>
+        <td colspan="3" class="remarks-cell">
+          <div class="remarks-wrap">
+            <textarea class="remarks" maxlength="70"></textarea>
+            <div class="counter">0/70</div>
+          </div>
+        </td>
       </tr>
 
       <!-- A3 -->
@@ -149,7 +186,12 @@
           <label><input type="radio" name="A3" value="no"> Tidak</label>
           <label><input type="radio" name="A3" value="na"> N/A</label>
         </div></td>
-        <td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td>
+        <td colspan="3" class="remarks-cell">
+          <div class="remarks-wrap">
+            <textarea class="remarks" maxlength="70"></textarea>
+            <div class="counter">0/70</div>
+          </div>
+        </td>
       </tr>
 
       <!-- A4 -->
@@ -164,7 +206,12 @@
           <label><input type="radio" name="A4" value="no"> Tidak</label>
           <label><input type="radio" name="A4" value="na"> N/A</label>
         </div></td>
-        <td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td>
+        <td colspan="3" class="remarks-cell">
+          <div class="remarks-wrap">
+            <textarea class="remarks" maxlength="70"></textarea>
+            <div class="counter">0/70</div>
+          </div>
+        </td>
       </tr>
     </tbody>
 
@@ -177,21 +224,36 @@
         <label><input type="radio" name="B5" value="yes"> Ya</label>
         <label><input type="radio" name="B5" value="no"> Tidak</label>
         <label><input type="radio" name="B5" value="na"> N/A</label>
-      </div></td><td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td></tr>
+      </div></td><td colspan="3" class="remarks-cell">
+        <div class="remarks-wrap">
+          <textarea class="remarks" maxlength="70"></textarea>
+          <div class="counter">0/70</div>
+        </div>
+      </td></tr>
 
       <tr><td class="col-no">B6</td><td colspan="4" class="ques">Petugas inspeksi pemindahan ditunjuk & kompeten.</td></tr>
       <tr class="subrow"><td></td><td><div class="yn">
         <label><input type="radio" name="B6" value="yes"> Ya</label>
         <label><input type="radio" name="B6" value="no"> Tidak</label>
         <label><input type="radio" name="B6" value="na"> N/A</label>
-      </div></td><td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td></tr>
+      </div></td><td colspan="3" class="remarks-cell">
+        <div class="remarks-wrap">
+          <textarea class="remarks" maxlength="70"></textarea>
+          <div class="counter">0/70</div>
+        </div>
+      </td></tr>
 
       <tr class="row-alt"><td class="col-no">B7</td><td colspan="4" class="ques">Operator alat angkat memiliki kualifikasi/izin sesuai persyaratan lokal & masih berlaku.</td></tr>
       <tr class="subrow row-alt"><td></td><td><div class="yn">
         <label><input type="radio" name="B7" value="yes"> Ya</label>
         <label><input type="radio" name="B7" value="no"> Tidak</label>
         <label><input type="radio" name="B7" value="na"> N/A</label>
-      </div></td><td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td></tr>
+      </div></td><td colspan="3" class="remarks-cell">
+        <div class="remarks-wrap">
+          <textarea class="remarks" maxlength="70"></textarea>
+          <div class="counter">0/70</div>
+        </div>
+      </td></tr>
     </tbody>
 
     <!-- ===== SECTION C ===== -->
@@ -203,28 +265,48 @@
         <label><input type="radio" name="C8" value="yes"> Ya</label>
         <label><input type="radio" name="C8" value="no"> Tidak</label>
         <label><input type="radio" name="C8" value="na"> N/A</label>
-      </div></td><td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td></tr>
+      </div></td><td colspan="3" class="remarks-cell">
+        <div class="remarks-wrap">
+          <textarea class="remarks" maxlength="70"></textarea>
+          <div class="counter">0/70</div>
+        </div>
+      </td></tr>
 
       <tr><td class="col-no">C9</td><td colspan="4" class="ques">Alat angkat yang digunakan diperiksa sebelum didatangkan/dipakai.</td></tr>
       <tr class="subrow"><td></td><td><div class="yn">
         <label><input type="radio" name="C9" value="yes"> Ya</label>
         <label><input type="radio" name="C9" value="no"> Tidak</label>
         <label><input type="radio" name="C9" value="na"> N/A</label>
-      </div></td><td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td></tr>
+      </div></td><td colspan="3" class="remarks-cell">
+        <div class="remarks-wrap">
+          <textarea class="remarks" maxlength="70"></textarea>
+          <div class="counter">0/70</div>
+        </div>
+      </td></tr>
 
       <tr class="row-alt"><td class="col-no">C10</td><td colspan="4" class="ques">Alat bantu lainnya diinspeksi & dinyatakan layak.</td></tr>
       <tr class="subrow row-alt"><td></td><td><div class="yn">
         <label><input type="radio" name="C10" value="yes"> Ya</label>
         <label><input type="radio" name="C10" value="no"> Tidak</label>
         <label><input type="radio" name="C10" value="na"> N/A</label>
-      </div></td><td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td></tr>
+      </div></td><td colspan="3" class="remarks-cell">
+        <div class="remarks-wrap">
+          <textarea class="remarks" maxlength="70"></textarea>
+          <div class="counter">0/70</div>
+        </div>
+      </td></tr>
 
       <tr><td class="col-no">C11</td><td colspan="4" class="ques">PPE sesuai MSDS & MSRA.</td></tr>
       <tr class="subrow"><td></td><td><div class="yn">
         <label><input type="radio" name="C11" value="yes"> Ya</label>
         <label><input type="radio" name="C11" value="no"> Tidak</label>
         <label><input type="radio" name="C11" value="na"> N/A</label>
-      </div></td><td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td></tr>
+      </div></td><td colspan="3" class="remarks-cell">
+        <div class="remarks-wrap">
+          <textarea class="remarks" maxlength="70"></textarea>
+          <div class="counter">0/70</div>
+        </div>
+      </td></tr>
     </tbody>
 
     <!-- ===== SECTION D ===== -->
@@ -236,28 +318,48 @@
         <label><input type="radio" name="D12" value="yes"> Ya</label>
         <label><input type="radio" name="D12" value="no"> Tidak</label>
         <label><input type="radio" name="D12" value="na"> N/A</label>
-      </div></td><td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td></tr>
+      </div></td><td colspan="3" class="remarks-cell">
+        <div class="remarks-wrap">
+          <textarea class="remarks" maxlength="70"></textarea>
+          <div class="counter">0/70</div>
+        </div>
+      </td></tr>
 
       <tr><td class="col-no">D13</td><td colspan="4" class="ques">Kendaraan pengangkut sampah/material direncanakan.</td></tr>
       <tr class="subrow"><td></td><td><div class="yn">
         <label><input type="radio" name="D13" value="yes"> Ya</label>
         <label><input type="radio" name="D13" value="no"> Tidak</label>
         <label><input type="radio" name="D13" value="na"> N/A</label>
-      </div></td><td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td></tr>
+      </div></td><td colspan="3" class="remarks-cell">
+        <div class="remarks-wrap">
+          <textarea class="remarks" maxlength="70"></textarea>
+          <div class="counter">0/70</div>
+        </div>
+      </td></tr>
 
       <tr class="row-alt"><td class="col-no">D14</td><td colspan="4" class="ques">Program kebersihan area penyimpanan (housekeeping) berjalan.</td></tr>
       <tr class="subrow row-alt"><td></td><td><div class="yn">
         <label><input type="radio" name="D14" value="yes"> Ya</label>
         <label><input type="radio" name="D14" value="no"> Tidak</label>
         <label><input type="radio" name="D14" value="na"> N/A</label>
-      </div></td><td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td></tr>
+      </div></td><td colspan="3" class="remarks-cell">
+        <div class="remarks-wrap">
+          <textarea class="remarks" maxlength="70"></textarea>
+          <div class="counter">0/70</div>
+        </div>
+      </td></tr>
 
       <tr><td class="col-no">D15</td><td colspan="4" class="ques">Program Room Free Dust & Floor Protection tersedia.</td></tr>
       <tr class="subrow"><td></td><td><div class="yn">
         <label><input type="radio" name="D15" value="yes"> Ya</label>
         <label><input type="radio" name="D15" value="no"> Tidak</label>
         <label><input type="radio" name="D15" value="na"> N/A</label>
-      </div></td><td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td></tr>
+      </div></td><td colspan="3" class="remarks-cell">
+        <div class="remarks-wrap">
+          <textarea class="remarks" maxlength="70"></textarea>
+          <div class="counter">0/70</div>
+        </div>
+      </td></tr>
     </tbody>
   </table>
 
@@ -282,6 +384,9 @@
     <button class="btn" id="printBtn" style="border:none;border-radius:10px;padding:10px 14px;font-weight:700;background:#111827;color:#fff">Print PDF (A4)</button>
     <button class="btn" id="resetBtn" style="border:none;border-radius:10px;padding:10px 14px;font-weight:700;background:#0ea5e9;color:#fff">Reset</button>
   </div>
+
+  <!-- small toast -->
+  <div id="toast" class="note-pop" role="status" aria-live="polite">Maksimal 70 karakter untuk Remarks.</div>
 </div>
 
 <script>
@@ -329,7 +434,44 @@
   document.querySelectorAll('#chkTable input[type=radio]').forEach(r=>r.addEventListener('change', refreshScores));
   refreshScores();
 
-  // photo preview
+  // ---- Remarks: 70 chars hard limit + counter + notice ----
+  const MAX_CHARS = 70;
+  const toast = document.getElementById('toast');
+  let toastTimer = null;
+  function showToast(){
+    toast.classList.add('show');
+    if(toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=>toast.classList.remove('show'), 1700);
+  }
+  function updateCounter(area){
+    const wrap = area.closest('.remarks-wrap');
+    const counter = wrap.querySelector('.counter');
+    const len = area.value.length;
+    counter.textContent = `${len}/${MAX_CHARS}`;
+    counter.classList.toggle('limit', len >= MAX_CHARS);
+  }
+  document.querySelectorAll('textarea.remarks').forEach(area=>{
+    // init
+    area.setAttribute('maxlength', String(MAX_CHARS));
+    updateCounter(area);
+    // input listener
+    area.addEventListener('input', e=>{
+      if(e.target.value.length > MAX_CHARS){
+        e.target.value = e.target.value.slice(0, MAX_CHARS);
+        showToast();
+      }
+      updateCounter(e.target);
+    });
+    // paste listener triggers toast if exceed
+    area.addEventListener('paste', (e)=>{
+      const pasted = (e.clipboardData || window.clipboardData).getData('text');
+      const current = e.target.value;
+      if(current.length + pasted.length > MAX_CHARS){ showToast(); }
+      setTimeout(()=>updateCounter(e.target), 0);
+    });
+  });
+
+  // ---- photo preview ----
   document.querySelectorAll('.photo-card input[type=file]').forEach(inp=>{
     inp.addEventListener('change', e=>{
       const f = e.target.files[0]; if(!f) return;
@@ -340,11 +482,11 @@
     });
   });
 
-  // print & reset
+  // ---- print & reset ----
   document.getElementById('printBtn').addEventListener('click', ()=>window.print());
   document.getElementById('resetBtn').addEventListener('click', ()=>{
     document.querySelectorAll('#chkTable input[type=radio]').forEach(r=>r.checked=false);
-    document.querySelectorAll('.remarks').forEach(t=>t.value='');
+    document.querySelectorAll('.remarks').forEach(t=>{ t.value=''; updateCounter(t); });
     document.querySelectorAll('.photo-card').forEach(card=>{
       card.querySelector('.photo-stage').innerHTML='<span>Tambahkan Foto</span>';
       card.querySelector('input[type=file]').value='';
