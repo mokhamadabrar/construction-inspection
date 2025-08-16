@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Material Handling Checklist (HTML versi Excel)</title>
+<style>
+  :root{
+    --purple:#7030a0;      /* Title */
+    --blue:#00b0f0;        /* Section header bar */
+    --header:#d9edf8;      /* Column header light */
+    --grid:#b7c3d1;        /* Border light */
+    --text:#111827;
+    --muted:#374151;
+    --bg:#ffffff;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font:14px/1.35 "Calibri", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding:28px;
+  }
+  .sheet{
+    max-width:1024px; margin:0 auto; background:#fff;
+  }
+  /* Title */
+  .title{
+    text-align:center; font-weight:700; color:var(--purple);
+    font-size:28px; letter-spacing:.5px; margin-bottom:8px;
+  }
+  .meta{
+    width:100%; border-collapse:collapse; margin:0 0 14px;
+  }
+  .meta td{
+    padding:3px 6px;
+  }
+  .meta td.k{width:120px; color:var(--muted)}
+  /* Table */
+  .tbl{
+    width:100%; border-collapse:collapse; table-layout:fixed;
+    border:1px solid var(--grid);
+  }
+  .tbl colgroup col:nth-child(1){width:52px;}   /* Section letter */
+  .tbl colgroup col:nth-child(2){width:36px;}   /* Row number */
+  .tbl colgroup col:nth-child(3){width:auto;}   /* Question */
+  .tbl colgroup col:nth-child(4),
+  .tbl colgroup col:nth-child(5),
+  .tbl colgroup col:nth-child(6){width:64px;}   /* YES/NO/NA */
+  .tbl colgroup col:nth-child(7){width:160px;}  /* Remarks */
+  .tbl th,.tbl td{
+    border:1px solid var(--grid); padding:8px 10px; vertical-align:top; background:#fff;
+  }
+  .tbl thead th{
+    background:var(--header); text-align:center; font-weight:700;
+  }
+  .secbar th{
+    background:var(--blue); color:#fff; font-weight:700;
+    text-align:left; font-size:14px; padding:8px 10px;
+  }
+  .secbar .letter{
+    background:var(--blue); color:#fff; text-align:center; font-size:16px;
+  }
+  .center{text-align:center}
+  .score-row td{
+    background:#f3f7fb; font-weight:700;
+  }
+  .score-value{
+    text-align:right;
+  }
+  .checkbox-cell{
+    text-align:center;
+  }
+  .foot{
+    display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:24px;
+  }
+  .photo{
+    border:1px solid var(--grid); height:280px; display:grid; place-items:center;
+    position:relative; background:#d2def0;
+  }
+  .photo input[type=file]{
+    position:absolute; inset:0; opacity:0; cursor:pointer;
+  }
+  .photo .hint{
+    color:#2d466e; font-weight:700; font-size:18px;
+  }
+  .total{
+    margin-top:10px; text-align:right; font-weight:700;
+  }
+  .pill{display:inline-block; border:1px solid var(--grid); padding:2px 8px; border-radius:999px; font-size:12px; color:#4b5563;}
+  .actions{display:flex; gap:8px; align-items:center; justify-content:flex-end; margin:10px 0;}
+  .btn{padding:8px 12px; border:1px solid #9fb6c7; background:#eef6ff; cursor:pointer; border-radius:6px;}
+  .btn:hover{filter:brightness(0.97)}
+</style>
+</head>
+<body>
+<div class="sheet">
+  <div class="title">MATERIAL HANDLING CHECKLIST</div>
+  <table class="meta">
+    <tr><td class="k">Inspector</td><td>:</td><td><input id="m-inspector" style="width:260px"></td></tr>
+    <tr><td class="k">Project</td><td>:</td><td><input id="m-project" value="JKT09" style="width:120px"></td></tr>
+    <tr><td class="k">Date</td><td>:</td><td><input id="m-date" type="date"></td></tr>
+  </table>
+
+  <div class="actions">
+    <span class="pill">YES=1, NO=0, N/A dikecualikan</span>
+    <button class="btn" id="btn-reset">Reset</button>
+    <button class="btn" id="btn-export">Export JSON</button>
+  </div>
+
+  <table class="tbl" id="checklist">
+    <colgroup>
+      <col><col><col><col><col><col><col>
+    </colgroup>
+    <thead>
+      <tr>
+        <th class="center">A–D</th>
+        <th class="center">#</th>
+        <th>METHOD OF WORK PLAN</th>
+        <th class="center">YES</th>
+        <th class="center">NO</th>
+        <th class="center">N/A</th>
+        <th>REMARKS</th>
+      </tr>
+    </thead>
+    <tbody id="tbody">
+      <!-- Section A -->
+      <tr class="secbar">
+        <th class="letter">A</th>
+        <th colspan="6">METHOD OF WORK PLAN</th>
+      </tr>
+      <tr data-sec="A"><td class="center">A</td><td class="center">1</td><td>Rencana & Penempatan: Sesuai MSRA baik lokasi, jadwal, dan spesifikasi area penyimpanan sudah ditetapkan dan diverifikasi kesesuaiannya.</td><td class="checkbox-cell"><input type="radio" name="r1" value="Y"></td><td class="checkbox-cell"><input type="radio" name="r1" value="N"></td><td class="checkbox-cell"><input type="radio" name="r1" value="X"></td><td contenteditable></td></tr>
+      <tr data-sec="A"><td class="center">A</td><td class="center">2</td><td>Logistik & Akses Pemindahan: Telah diketahui berat/dimensi material, metode movement & jenis alat angkat. Akses dalam gedung dan staging area sementara siap bila akses belum siap.</td><td class="checkbox-cell"><input type="radio" name="r2" value="Y"></td><td class="checkbox-cell"><input type="radio" name="r2" value="N"></td><td class="checkbox-cell"><input type="radio" name="r2" value="X"></td><td contenteditable></td></tr>
+      <tr data-sec="A"><td class="center">A</td><td class="center">3</td><td>Keselamatan & Segregasi: Jalur pejalan kaki memenuhi standar dan terpisah dari aktivitas material; penghalang fisik tersedia; bebas bahaya.</td><td class="checkbox-cell"><input type="radio" name="r3" value="Y"></td><td class="checkbox-cell"><input type="radio" name="r3" value="N"></td><td class="checkbox-cell"><input type="radio" name="r3" value="X"></td><td contenteditable></td></tr>
+      <tr data-sec="A"><td class="center">A</td><td class="center">4</td><td>Engineer/Supervisor memahami aturan manual handling. Material panjang (>3 m) diangkat ≥2 orang.</td><td class="checkbox-cell"><input type="radio" name="r4" value="Y"></td><td class="checkbox-cell"><input type="radio" name="r4" value="N"></td><td class="checkbox-cell"><input type="radio" name="r4" value="X"></td><td contenteditable></td></tr>
+      <tr class="score-row"><td></td><td colspan="5">SCORE A</td><td class="score-value" id="score-A">0.00</td></tr>
+
+      <!-- Section B -->
+      <tr class="secbar">
+        <th class="letter">B</th>
+        <th colspan="6">PEOPLE / COMPETENCE / QUALIFICATION</th>
+      </tr>
+      <tr data-sec="B"><td class="center">B</td><td class="center">5</td><td>GC menunjuk Move Manager yang berkualifikasi & bertanggung jawab atas tugasnya.</td><td class="checkbox-cell"><input type="radio" name="r5" value="Y"></td><td class="checkbox-cell"><input type="radio" name="r5" value="N"></td><td class="checkbox-cell"><input type="radio" name="r5" value="X"></td><td contenteditable></td></tr>
+      <tr data-sec="B"><td class="center">B</td><td class="center">6</td><td>Operator menunjukkan kompetensi melakukan inspeksi peralatan.</td><td class="checkbox-cell"><input type="radio" name="r6" value="Y"></td><td class="checkbox-cell"><input type="radio" name="r6" value="N"></td><td class="checkbox-cell"><input type="radio" name="r6" value="X"></td><td contenteditable></td></tr>
+      <tr data-sec="B"><td class="center">B</td><td class="center">7</td><td>Operator memiliki kualifikasi sesuai local requirement yang masih berlaku.</td><td class="checkbox-cell"><input type="radio" name="r7" value="Y"></td><td class="checkbox-cell"><input type="radio" name="r7" value="N"></td><td class="checkbox-cell"><input type="radio" name="r7" value="X"></td><td contenteditable></td></tr>
+      <tr class="score-row"><td></td><td colspan="5">SCORE B</td><td class="score-value" id="score-B">0.00</td></tr>
+
+      <!-- Section C -->
+      <tr class="secbar">
+        <th class="letter">C</th>
+        <th colspan="6">TOOLS</th>
+      </tr>
+      <tr data-sec="C"><td class="center">C</td><td class="center">8</td><td>Alat angkat bersertifikat & valid sesuai regulasi.</td><td class="checkbox-cell"><input type="radio" name="r8" value="Y"></td><td class="checkbox-cell"><input type="radio" name="r8" value="N"></td><td class="checkbox-cell"><input type="radio" name="r8" value="X"></td><td contenteditable></td></tr>
+      <tr data-sec="C"><td class="center">C</td><td class="center">9</td><td>Peralatan tambahan/rigging sesuai inspeksi & layak pakai.</td><td class="checkbox-cell"><input type="radio" name="r9" value="Y"></td><td class="checkbox-cell"><input type="radio" name="r9" value="N"></td><td class="checkbox-cell"><input type="radio" name="r9" value="X"></td><td contenteditable></td></tr>
+      <tr data-sec="C"><td class="center">C</td><td class="center">10</td><td>PPE disediakan sesuai MSDS & MSRA.</td><td class="checkbox-cell"><input type="radio" name="r10" value="Y"></td><td class="checkbox-cell"><input type="radio" name="r10" value="N"></td><td class="checkbox-cell"><input type="radio" name="r10" value="X"></td><td contenteditable></td></tr>
+      <tr class="score-row"><td></td><td colspan="5">SCORE C</td><td class="score-value" id="score-C">0.00</td></tr>
+
+      <!-- Section D -->
+      <tr class="secbar">
+        <th class="letter">D</th>
+        <th colspan="6">ENVIRONMENT MANAGEMENT / CLEAN WORKPLACE</th>
+      </tr>
+      <tr data-sec="D"><td class="center">D</td><td class="center">12</td><td>Perencanaan pengelolaan sampah material.</td><td class="checkbox-cell"><input type="radio" name="r12" value="Y"></td><td class="checkbox-cell"><input type="radio" name="r12" value="N"></td><td class="checkbox-cell"><input type="radio" name="r12" value="X"></td><td contenteditable></td></tr>
+      <tr data-sec="D"><td class="center">D</td><td class="center">13</td><td>Perencanaan kendaraan pengangkut sampah.</td><td class="checkbox-cell"><input type="radio" name="r13" value="Y"></td><td class="checkbox-cell"><input type="radio" name="r13" value="N"></td><td class="checkbox-cell"><input type="radio" name="r13" value="X"></td><td contenteditable></td></tr>
+      <tr data-sec="D"><td class="center">D</td><td class="center">14</td><td>Program kebersihan area penyimpanan.</td><td class="checkbox-cell"><input type="radio" name="r14" value="Y"></td><td class="checkbox-cell"><input type="radio" name="r14" value="N"></td><td class="checkbox-cell"><input type="radio" name="r14" value="X"></td><td contenteditable></td></tr>
+      <tr data-sec="D"><td class="center">D</td><td class="center">15</td><td>Program room free dust & floor protection.</td><td class="checkbox-cell"><input type="radio" name="r15" value="Y"></td><td class="checkbox-cell"><input type="radio" name="r15" value="N"></td><td class="checkbox-cell"><input type="radio" name="r15" value="X"></td><td contenteditable></td></tr>
+      <tr class="score-row"><td></td><td colspan="5">SCORE D</td><td class="score-value" id="score-D">0.00</td></tr>
+    </tbody>
+  </table>
+
+  <div class="total">TOTAL SCORE: <span id="total">0.00</span></div>
+
+  <div class="foot">
+    <div class="photo" data-slot="1">
+      <span class="hint">Add Your Photo</span>
+      <input type="file" accept="image/*">
+    </div>
+    <div class="photo" data-slot="2">
+      <span class="hint">Add Your Photo</span>
+      <input type="file" accept="image/*">
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const tbody = document.getElementById('tbody');
+  const totalEl = document.getElementById('total');
+  const sections = ['A','B','C','D'];
+  const scoreEls = {
+    A: document.getElementById('score-A'),
+    B: document.getElementById('score-B'),
+    C: document.getElementById('score-C'),
+    D: document.getElementById('score-D')
+  };
+  const SCORE_PER_YES = 1;
+
+  function calc(){
+    let total = 0;
+    sections.forEach(sec => {
+      const rows = Array.from(tbody.querySelectorAll(`tr[data-sec="${sec}"]`));
+      let yes = 0, valid = 0;
+      rows.forEach(row => {
+        const name = row.querySelector('input[type=radio]')?.name;
+        if(!name) return;
+        const choice = tbody.querySelector(`input[name="${name}"]:checked`);
+        if(!choice) return;
+        if(choice.value !== 'X'){ // X = N/A, exclude
+          valid++;
+          if(choice.value === 'Y') yes++;
+        }
+      });
+      const score = valid ? (yes * SCORE_PER_YES) : 0;
+      scoreEls[sec].textContent = score.toFixed(2);
+      total += score;
+    });
+    totalEl.textContent = total.toFixed(2);
+  }
+
+  tbody.addEventListener('change', calc);
+
+  // Photos preview
+  document.querySelectorAll('.photo input[type=file]').forEach(inp => {
+    inp.addEventListener('change', e => {
+      const f = e.target.files && e.target.files[0];
+      if(!f) return;
+      const url = URL.createObjectURL(f);
+      const holder = e.target.parentElement;
+      holder.innerHTML = '';
+      const img = new Image();
+      img.style.maxWidth = '100%';
+      img.style.maxHeight = '100%';
+      img.onload = () => URL.revokeObjectURL(url);
+      img.src = url;
+      holder.appendChild(img);
+      holder.appendChild(e.target); // keep input on top
+      e.target.style.position='absolute'; e.target.style.inset='0'; e.target.style.opacity='0';
+    });
+  });
+
+  // Reset / Export
+  document.getElementById('btn-reset').addEventListener('click', () => {
+    document.querySelectorAll('input[type=radio]').forEach(i => i.checked=false);
+    document.querySelectorAll('[contenteditable]').forEach(td => td.textContent='');
+    document.querySelectorAll('.photo').forEach(p => { p.innerHTML='<span class="hint">Add Your Photo</span><input type="file" accept="image/*">'; });
+    calc();
+  });
+
+  document.getElementById('btn-export').addEventListener('click', () => {
+    const data = [];
+    tbody.querySelectorAll('tr[data-sec]').forEach(tr => {
+      const sec = tr.dataset.sec;
+      const idx = tr.children[1].textContent.trim();
+      const q = tr.children[2].textContent.trim();
+      const name = tr.querySelector('input[type=radio]')?.name;
+      const sel = name ? (document.querySelector(`input[name="${name}"]:checked`)?.value || '') : '';
+      const remarks = tr.children[6].textContent.trim();
+      data.push({section:sec, index:idx, question:q, choice:sel, remarks});
+    });
+    const meta = {
+      inspector: document.getElementById('m-inspector').value,
+      project: document.getElementById('m-project').value,
+      date: document.getElementById('m-date').value,
+      total: document.getElementById('total').textContent,
+      per_section: {
+        A: document.getElementById('score-A').textContent,
+        B: document.getElementById('score-B').textContent,
+        C: document.getElementById('score-C').textContent,
+        D: document.getElementById('score-D').textContent
+      }
+    };
+    const out = {meta, items:data};
+    const blob = new Blob([JSON.stringify(out,null,2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'material_handling_checklist.json';
+    document.body.appendChild(a); a.click(); a.remove();
+  });
+
+  // Initial calc
+  calc();
+})();
+</script>
+</body>
+</html>
