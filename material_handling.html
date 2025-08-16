@@ -1,319 +1,264 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Material Handling Checklist</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Material Handling Checklist — v2</title>
 <style>
   :root{
-    --brand:#6a1b9a;
-    --row:#f7f9fc;
-    --header:#0ea5e9;
-    --border:#d1d5db;
-    --ok:#16a34a;
-    --warn:#ef4444;
-    --muted:#6b7280;
+    --brand:#6a1b9a; --row:#f7f9fc; --header:#0ea5e9; --border:#d1d5db;
+    --ok:#16a34a; --bad:#ef4444; --muted:#6b7280;
   }
   *{box-sizing:border-box}
-  body{
-    font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
-    margin:0; color:#111827; background:white;
-  }
-
-  /* page container */
-  .page{
-    max-width:1050px; /* A4 inner width roughly at 96dpi */
-    margin:16px auto; padding:16px;
-  }
-
-  /* title block */
-  .title{
-    text-align:center; font-weight:800; letter-spacing:.3px;
-    color:var(--brand); font-size:clamp(18px,4vw,28px);
-    margin-bottom:8px;
-  }
-  .meta{
-    display:grid; gap:8px 16px;
-    grid-template-columns: repeat(6,1fr);
-    font-size:13px; margin:8px 0 16px;
-  }
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;
+       margin:0;color:#111827;background:#fff}
+  .page{max-width:1050px;margin:16px auto;padding:16px}
+  .title{ color:var(--brand); text-align:center; font-weight:800;
+          font-size:clamp(18px,4vw,28px); margin:0 0 10px}
+  .meta{display:grid;gap:8px 16px;grid-template-columns:repeat(6,1fr);font-size:13px}
   .meta .label{color:var(--muted)}
-  .meta input{
-    width:100%; padding:6px 8px; border:1px solid var(--border); border-radius:6px;
-  }
+  .meta input{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px}
 
-  /* table base */
-  .chk-table{
-    width:100%; border-collapse:collapse; table-layout:fixed;
-    border:1px solid var(--border); border-radius:10px; overflow:hidden;
-  }
-  .chk-table thead th{
-    background:var(--header); color:white; padding:10px 8px; font-weight:700;
-    font-size:13px; text-align:center; border:1px solid var(--header);
-  }
-  .section-head{
-    background:#e2f3fb; color:#0b4a6f; font-weight:700; padding:8px; font-size:13px;
-    border-top:1px solid var(--border); border-bottom:1px solid var(--border);
-  }
-  .sec-code{width:36px; text-align:center; font-weight:800; color:#0b4a6f}
-  .col-no{width:34px; text-align:center}
+  /* table */
+  .chk-table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid var(--border);border-radius:10px;margin-top:14px}
+  .chk-table thead th{background:var(--header);color:#fff;padding:10px 8px;font-weight:700;font-size:13px;text-align:center;border-right:1px solid var(--header)}
+  .chk-table thead th:last-child{border-right:none}
+  .section-head{background:#e2f3fb;color:#0b4a6f;font-weight:700;padding:8px;font-size:13px;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+  .col-no{width:70px;text-align:center;font-weight:800;color:#0b4a6f}
   .col-ques{width:auto}
-  .col-yn{width:48px; text-align:center}
-  .col-remarks{width:22%}
-  .chk-table td{
-    padding:8px; border:1px solid var(--border); vertical-align:top; background:white;
-  }
-  .alt td{background:var(--row)}
-  .ques{font-size:13px; line-height:1.35}
+  .col-yn{width:70px;text-align:center}
+  .chk-table td{padding:8px;border-top:1px solid var(--border)}
+  .row-alt{background:var(--row)}
+  .ques{font-size:13px;line-height:1.35}
+  .yn{display:flex;gap:6px;justify-content:center;align-items:center}
+  .yn input{width:18px;height:18px}
+  .remarks{width:100%;min-height:40px;border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:12px;resize:vertical}
+  /* second line (radio+remarks) should visually group */
+  .subrow td{border-top:none;padding-top:4px;padding-bottom:10px}
+  .remarks-cell{padding:6px 8px 10px}
 
-  /* touch friendly radios */
-  .yn{
-    display:flex; gap:6px; justify-content:center; align-items:center;
-  }
-  .yn input{ width:18px; height:18px; }
-  .remarks{
-    width:100%; min-height:36px; resize:vertical; font-size:12px;
-    border:1px solid var(--border); border-radius:6px; padding:6px 8px;
-  }
+  /* scores */
+  .scores{display:grid;gap:10px;grid-template-columns:repeat(5,1fr);margin:14px 0 6px}
+  .score-card{border:1px solid var(--border);border-radius:10px;background:#fafafa;padding:10px}
+  .score-card h4{margin:0 0 8px;font-size:13px;color:#0b4a6f}
+  .score-val{font-weight:800;font-size:18px}
+  .badge{border-radius:999px;padding:3px 8px;font-size:11px;margin-left:8px;color:#fff; background:#111827}
+  .good{background:var(--ok)!important} .bad{background:var(--bad)!important}
 
-  /* score bar */
-  .scores{
-    display:grid; gap:10px; grid-template-columns: repeat(5,1fr);
-    margin:14px 0 4px;
-  }
-  .score-card{
-    border:1px solid var(--border); border-radius:10px; padding:10px;
-    background:#fafafa;
-  }
-  .score-card h4{ margin:0 0 8px; font-size:13px; color:#0b4a6f }
-  .score-val{
-    font-weight:800; font-size:18px;
-  }
+  /* photos */
+  .photos{display:grid;gap:12px;grid-template-columns:repeat(2,1fr);margin-top:12px}
+  .photo-card{background:#4f81bd;border-radius:14px;padding:10px;color:#fff;min-height:210px;display:flex;flex-direction:column;gap:8px}
+  .photo-stage{flex:1;border:2px dashed rgba(255,255,255,.7);border-radius:12px;display:grid;place-items:center;overflow:hidden;background:rgba(255,255,255,.06)}
+  .photo-stage img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+  .photo-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .photo-actions input[type=file]{color:#fff;font-size:12px}
+  .photo-actions input[type=text]{flex:1;min-width:120px;border:none;border-radius:8px;padding:6px 8px;font-size:12px}
 
-  /* photo grid */
-  .photos{
-    display:grid; gap:12px; grid-template-columns: repeat(2,1fr);
-    margin-top:14px;
-  }
-  @media (max-width:640px){
-    .meta{ grid-template-columns: repeat(2,1fr); }
-    .photos{ grid-template-columns: 1fr; }
-    .col-remarks{ width:40% }
-  }
-  .photo-card{
-    background:#4f81bd; border-radius:14px; padding:10px; color:white;
-    position:relative; min-height:210px; display:flex; flex-direction:column; gap:8px;
-  }
-  .photo-stage{
-    flex:1; border:2px dashed rgba(255,255,255,.7);
-    border-radius:12px; display:grid; place-items:center; overflow:hidden;
-    background:rgba(255,255,255,.06);
-  }
-  .photo-stage img{
-    max-width:100%; max-height:100%; object-fit:contain; display:block;
-  }
-  .photo-actions{
-    display:flex; gap:8px; align-items:center; flex-wrap:wrap;
-  }
-  .photo-actions input[type=file]{
-    color:white; font-size:12px;
-  }
-  .photo-actions input[type=text]{
-    flex:1; min-width:120px; border:none; border-radius:8px; padding:6px 8px; font-size:12px;
-  }
-
-  /* buttons */
-  .toolbar{
-    display:flex; gap:10px; justify-content:flex-end; margin-top:12px; flex-wrap:wrap;
-  }
-  .btn{
-    border:none; border-radius:10px; padding:10px 14px; font-weight:700; cursor:pointer;
-    background:#111827; color:white;
-  }
-  .btn.secondary{ background:#0ea5e9 }
-  .badge{
-    border-radius:999px; padding:3px 8px; font-size:11px; margin-left:8px; color:white;
-  }
-  .good{background:var(--ok)} .bad{background:var(--warn)}
-
-  /* PRINT (A4, 1 page) */
-  @page{ size:A4 portrait; margin:12mm }
+  /* responsive */
+  @media (max-width:800px){ .meta{grid-template-columns:repeat(2,1fr)} .col-yn{width:64px}}
+  @media (max-width:640px){ .photos{grid-template-columns:1fr} .col-no{width:64px}}
+  /* print */
+  @page{size:A4 portrait;margin:12mm}
   @media print{
-    body{ background:white }
-    .toolbar{ display:none !important }
-    .page{ box-shadow:none; margin:0; padding:0 }
-    .photos .photo-card{ min-height:150px }
-    .meta input, .remarks, .photo-actions input[type=text]{ border:1px solid #ddd }
-    .score-val{ font-size:16px }
-    .chk-table td{ padding:6px }
-    .title{ margin-top:0 }
+    .toolbar{display:none!important}
+    .page{margin:0;padding:0}
+    .photo-card{min-height:150px}
+    .chk-table td{padding:6px}
+    .score-val{font-size:16px}
   }
 </style>
 </head>
 <body>
 <div class="page">
-
   <div class="title">MATERIAL HANDLING CHECKLIST</div>
 
   <div class="meta">
-    <div class="label">Inspector</div><input placeholder="Nama inspector" />
-    <div class="label">Project</div><input placeholder="Kode/Nama" value="JKT09"/>
-    <div class="label">Date</div><input type="date" />
-    <div class="label">Location</div><input placeholder="Lokasi" />
+    <div class="label">Inspector</div><input placeholder="Nama inspector"/>
+    <div class="label">Project</div><input value="JKT09" placeholder="Kode/Nama"/>
+    <div class="label">Date</div><input type="date"/>
+    <div class="label">Location</div><input placeholder="Lokasi"/>
   </div>
 
   <table class="chk-table" id="chkTable">
     <thead>
       <tr>
-        <th class="sec-code">A–D</th>
-        <th class="col-no">#</th>
-        <th class="col-ques">METHOD OF WORK PLAN</th>
+        <th class="col-no">No.</th>
+        <th class="col-ques">Pertanyaan</th>
         <th class="col-yn">YES</th>
         <th class="col-yn">NO</th>
         <th class="col-yn">N/A</th>
-        <th class="col-remarks">REMARKS</th>
       </tr>
     </thead>
 
-    <!-- SECTION A -->
+    <!-- ===== SECTION A ===== -->
     <tbody data-section="A">
-      <tr><td class="section-head" colspan="7">A. METHOD OF WORK PLAN</td></tr>
-      <!-- row template: code / no / ques / yes / no / na / remarks -->
-      <tr class="alt">
-        <td class="sec-code">A</td><td class="col-no">1</td>
-        <td class="ques">Rencana & Penempatan: MSRA sesuai lokasi, jadwal, spesifikasi area penyimpanan telah ditetapkan dan diverifikasi.</td>
-        <td class="yn"><input type="radio" name="A1" value="yes"></td>
-        <td class="yn"><input type="radio" name="A1" value="no"></td>
-        <td class="yn"><input type="radio" name="A1" value="na"></td>
-        <td><textarea class="remarks" placeholder="Catatan..."></textarea></td>
+      <tr><td class="section-head" colspan="5">A. METHOD OF WORK PLAN</td></tr>
+
+      <!-- A1 -->
+      <tr class="row-alt">
+        <td class="col-no">A1</td>
+        <td class="col-ques" colspan="4">
+          <div class="ques">Rencana & Penempatan: MSRA sesuai lokasi, jadwal, dan spesifikasi area penyimpanan telah ditetapkan dan diverifikasi kesesuaiannya.</div>
+        </td>
       </tr>
+      <tr class="subrow row-alt">
+        <td></td>
+        <td>
+          <div class="yn">
+            <label><input type="radio" name="A1" value="yes"> Ya</label>
+            <label><input type="radio" name="A1" value="no"> Tidak</label>
+            <label><input type="radio" name="A1" value="na"> N/A</label>
+          </div>
+        </td>
+        <td colspan="3" class="remarks-cell">
+          <textarea class="remarks" placeholder="Remarks (opsional)…"></textarea>
+        </td>
+      </tr>
+
+      <!-- A2 -->
       <tr>
-        <td class="sec-code">A</td><td class="col-no">2</td>
-        <td class="ques">Logistik & Akses: Berat/dimensi material, jalur, kondisi jalan, staging area sudah di-assessment.</td>
-        <td class="yn"><input type="radio" name="A2" value="yes"></td>
-        <td class="yn"><input type="radio" name="A2" value="no"></td>
-        <td class="yn"><input type="radio" name="A2" value="na"></td>
-        <td><textarea class="remarks"></textarea></td>
+        <td class="col-no">A2</td>
+        <td colspan="4">
+          <div class="ques">Logistik & Akses: Berat/dimensi material, metode movement & alat angkat, rute transporter (journey management), kondisi jalan, serta staging area telah di-assessment.</div>
+        </td>
       </tr>
-      <tr class="alt">
-        <td class="sec-code">A</td><td class="col-no">3</td>
-        <td class="ques">Keselamatan & Segregasi: Jalur pejalan kaki/area aman & pemisahan fisik memadai; bahaya diidentifikasi.</td>
-        <td class="yn"><input type="radio" name="A3" value="yes"></td>
-        <td class="yn"><input type="radio" name="A3" value="no"></td>
-        <td class="yn"><input type="radio" name="A3" value="na"></td>
-        <td><textarea class="remarks"></textarea></td>
+      <tr class="subrow">
+        <td></td>
+        <td>
+          <div class="yn">
+            <label><input type="radio" name="A2" value="yes"> Ya</label>
+            <label><input type="radio" name="A2" value="no"> Tidak</label>
+            <label><input type="radio" name="A2" value="na"> N/A</label>
+          </div>
+        </td>
+        <td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td>
       </tr>
+
+      <!-- A3 -->
+      <tr class="row-alt">
+        <td class="col-no">A3</td>
+        <td colspan="4">
+          <div class="ques">Keselamatan & Segregasi: Jalur pejalan kaki memenuhi standar & terpisah dari jalur material; penghalang fisik tersedia; bahaya (mis. kabel listrik, hambatan) diidentifikasi.</div>
+        </td>
+      </tr>
+      <tr class="subrow row-alt">
+        <td></td>
+        <td><div class="yn">
+          <label><input type="radio" name="A3" value="yes"> Ya</label>
+          <label><input type="radio" name="A3" value="no"> Tidak</label>
+          <label><input type="radio" name="A3" value="na"> N/A</label>
+        </div></td>
+        <td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td>
+      </tr>
+
+      <!-- A4 -->
       <tr>
-        <td class="sec-code">A</td><td class="col-no">4</td>
-        <td class="ques">Manual handling: batas maksimum 18.14 kg/orang; >3 m & material panjang diangkat multi-person.</td>
-        <td class="yn"><input type="radio" name="A4" value="yes"></td>
-        <td class="yn"><input type="radio" name="A4" value="no"></td>
-        <td class="yn"><input type="radio" name="A4" value="na"></td>
-        <td><textarea class="remarks"></textarea></td>
+        <td class="col-no">A4</td>
+        <td colspan="4">
+          <div class="ques">Manual handling: batas maksimum per orang 18.14 kg; material panjang/ >3 m diangkat lebih dari satu orang.</div>
+        </td>
+      </tr>
+      <tr class="subrow">
+        <td></td>
+        <td><div class="yn">
+          <label><input type="radio" name="A4" value="yes"> Ya</label>
+          <label><input type="radio" name="A4" value="no"> Tidak</label>
+          <label><input type="radio" name="A4" value="na"> N/A</label>
+        </div></td>
+        <td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td>
       </tr>
     </tbody>
 
-    <!-- SECTION B -->
+    <!-- ===== SECTION B ===== -->
     <tbody data-section="B">
-      <tr><td class="section-head" colspan="7">B. PEOPLE / COMPETENCE / QUALIFICATION</td></tr>
-      <tr class="alt">
-        <td class="sec-code">B</td><td class="col-no">5</td>
-        <td class="ques">GC menunjuk Move Manager berkompeten dan bertanggung jawab.</td>
-        <td class="yn"><input type="radio" name="B5" value="yes"></td>
-        <td class="yn"><input type="radio" name="B5" value="no"></td>
-        <td class="yn"><input type="radio" name="B5" value="na"></td>
-        <td><textarea class="remarks"></textarea></td>
-      </tr>
-      <tr>
-        <td class="sec-code">B</td><td class="col-no">6</td>
-        <td class="ques">Petugas inspeksi pemindahan ditunjuk & kompeten.</td>
-        <td class="yn"><input type="radio" name="B6" value="yes"></td>
-        <td class="yn"><input type="radio" name="B6" value="no"></td>
-        <td class="yn"><input type="radio" name="B6" value="na"></td>
-        <td><textarea class="remarks"></textarea></td>
-      </tr>
-      <tr class="alt">
-        <td class="sec-code">B</td><td class="col-no">7</td>
-        <td class="ques">Operator alat angkat memiliki kualifikasi/izin sesuai local requirement.</td>
-        <td class="yn"><input type="radio" name="B7" value="yes"></td>
-        <td class="yn"><input type="radio" name="B7" value="no"></td>
-        <td class="yn"><input type="radio" name="B7" value="na"></td>
-        <td><textarea class="remarks"></textarea></td>
-      </tr>
+      <tr><td class="section-head" colspan="5">B. PEOPLE / COMPETENCE / QUALIFICATION</td></tr>
+
+      <tr class="row-alt"><td class="col-no">B5</td><td colspan="4" class="ques">GC menunjuk Move Manager yang kompeten & bertanggung jawab.</td></tr>
+      <tr class="subrow row-alt"><td></td><td><div class="yn">
+        <label><input type="radio" name="B5" value="yes"> Ya</label>
+        <label><input type="radio" name="B5" value="no"> Tidak</label>
+        <label><input type="radio" name="B5" value="na"> N/A</label>
+      </div></td><td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td></tr>
+
+      <tr><td class="col-no">B6</td><td colspan="4" class="ques">Petugas inspeksi pemindahan ditunjuk & kompeten.</td></tr>
+      <tr class="subrow"><td></td><td><div class="yn">
+        <label><input type="radio" name="B6" value="yes"> Ya</label>
+        <label><input type="radio" name="B6" value="no"> Tidak</label>
+        <label><input type="radio" name="B6" value="na"> N/A</label>
+      </div></td><td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td></tr>
+
+      <tr class="row-alt"><td class="col-no">B7</td><td colspan="4" class="ques">Operator alat angkat memiliki kualifikasi/izin sesuai persyaratan lokal & masih berlaku.</td></tr>
+      <tr class="subrow row-alt"><td></td><td><div class="yn">
+        <label><input type="radio" name="B7" value="yes"> Ya</label>
+        <label><input type="radio" name="B7" value="no"> Tidak</label>
+        <label><input type="radio" name="B7" value="na"> N/A</label>
+      </div></td><td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td></tr>
     </tbody>
 
-    <!-- SECTION C -->
+    <!-- ===== SECTION C ===== -->
     <tbody data-section="C">
-      <tr><td class="section-head" colspan="7">C. TOOLS</td></tr>
-      <tr class="alt">
-        <td class="sec-code">C</td><td class="col-no">8</td>
-        <td class="ques">Sertifikasi alat angkat sesuai requirement & valid.</td>
-        <td class="yn"><input type="radio" name="C8" value="yes"></td>
-        <td class="yn"><input type="radio" name="C8" value="no"></td>
-        <td class="yn"><input type="radio" name="C8" value="na"></td>
-        <td><textarea class="remarks"></textarea></td>
-      </tr>
-      <tr>
-        <td class="sec-code">C</td><td class="col-no">9</td>
-        <td class="ques">Alat angkat yang akan digunakan diperiksa sebelum didatangkan/dipakai.</td>
-        <td class="yn"><input type="radio" name="C9" value="yes"></td>
-        <td class="yn"><input type="radio" name="C9" value="no"></td>
-        <td class="yn"><input type="radio" name="C9" value="na"></td>
-        <td><textarea class="remarks"></textarea></td>
-      </tr>
-      <tr class="alt">
-        <td class="sec-code">C</td><td class="col-no">10</td>
-        <td class="ques">Alat bantu lainnya diinspeksi & dinyatakan layak.</td>
-        <td class="yn"><input type="radio" name="C10" value="yes"></td>
-        <td class="yn"><input type="radio" name="C10" value="no"></td>
-        <td class="yn"><input type="radio" name="C10" value="na"></td>
-        <td><textarea class="remarks"></textarea></td>
-      </tr>
-      <tr>
-        <td class="sec-code">C</td><td class="col-no">11</td>
-        <td class="ques">PPE sesuai MSDS & MSRA.</td>
-        <td class="yn"><input type="radio" name="C11" value="yes"></td>
-        <td class="yn"><input type="radio" name="C11" value="no"></td>
-        <td class="yn"><input type="radio" name="C11" value="na"></td>
-        <td><textarea class="remarks"></textarea></td>
-      </tr>
+      <tr><td class="section-head" colspan="5">C. TOOLS</td></tr>
+
+      <tr class="row-alt"><td class="col-no">C8</td><td colspan="4" class="ques">Sertifikasi alat angkat sesuai requirement & valid.</td></tr>
+      <tr class="subrow row-alt"><td></td><td><div class="yn">
+        <label><input type="radio" name="C8" value="yes"> Ya</label>
+        <label><input type="radio" name="C8" value="no"> Tidak</label>
+        <label><input type="radio" name="C8" value="na"> N/A</label>
+      </div></td><td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td></tr>
+
+      <tr><td class="col-no">C9</td><td colspan="4" class="ques">Alat angkat yang digunakan diperiksa sebelum didatangkan/dipakai.</td></tr>
+      <tr class="subrow"><td></td><td><div class="yn">
+        <label><input type="radio" name="C9" value="yes"> Ya</label>
+        <label><input type="radio" name="C9" value="no"> Tidak</label>
+        <label><input type="radio" name="C9" value="na"> N/A</label>
+      </div></td><td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td></tr>
+
+      <tr class="row-alt"><td class="col-no">C10</td><td colspan="4" class="ques">Alat bantu lainnya diinspeksi & dinyatakan layak.</td></tr>
+      <tr class="subrow row-alt"><td></td><td><div class="yn">
+        <label><input type="radio" name="C10" value="yes"> Ya</label>
+        <label><input type="radio" name="C10" value="no"> Tidak</label>
+        <label><input type="radio" name="C10" value="na"> N/A</label>
+      </div></td><td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td></tr>
+
+      <tr><td class="col-no">C11</td><td colspan="4" class="ques">PPE sesuai MSDS & MSRA.</td></tr>
+      <tr class="subrow"><td></td><td><div class="yn">
+        <label><input type="radio" name="C11" value="yes"> Ya</label>
+        <label><input type="radio" name="C11" value="no"> Tidak</label>
+        <label><input type="radio" name="C11" value="na"> N/A</label>
+      </div></td><td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td></tr>
     </tbody>
 
-    <!-- SECTION D -->
+    <!-- ===== SECTION D ===== -->
     <tbody data-section="D">
-      <tr><td class="section-head" colspan="7">D. ENVIRONMENT MANAGEMENT / CLEAN WORKPLACE</td></tr>
-      <tr class="alt">
-        <td class="sec-code">D</td><td class="col-no">12</td>
-        <td class="ques">Rencana penanganan & pengangkutan sampah material tersedia.</td>
-        <td class="yn"><input type="radio" name="D12" value="yes"></td>
-        <td class="yn"><input type="radio" name="D12" value="no"></td>
-        <td class="yn"><input type="radio" name="D12" value="na"></td>
-        <td><textarea class="remarks"></textarea></td>
-      </tr>
-      <tr>
-        <td class="sec-code">D</td><td class="col-no">13</td>
-        <td class="ques">Kendaraan pengangkut sampah/material direncanakan.</td>
-        <td class="yn"><input type="radio" name="D13" value="yes"></td>
-        <td class="yn"><input type="radio" name="D13" value="no"></td>
-        <td class="yn"><input type="radio" name="D13" value="na"></td>
-        <td><textarea class="remarks"></textarea></td>
-      </tr>
-      <tr class="alt">
-        <td class="sec-code">D</td><td class="col-no">14</td>
-        <td class="ques">Program kebersihan area penyimpanan (housekeeping) berjalan.</td>
-        <td class="yn"><input type="radio" name="D14" value="yes"></td>
-        <td class="yn"><input type="radio" name="D14" value="no"></td>
-        <td class="yn"><input type="radio" name="D14" value="na"></td>
-        <td><textarea class="remarks"></textarea></td>
-      </tr>
-      <tr>
-        <td class="sec-code">D</td><td class="col-no">15</td>
-        <td class="ques">Program Room Free Dust & Floor Protection tersedia.</td>
-        <td class="yn"><input type="radio" name="D15" value="yes"></td>
-        <td class="yn"><input type="radio" name="D15" value="no"></td>
-        <td class="yn"><input type="radio" name="D15" value="na"></td>
-        <td><textarea class="remarks"></textarea></td>
-      </tr>
+      <tr><td class="section-head" colspan="5">D. ENVIRONMENT MANAGEMENT / CLEAN WORKPLACE</td></tr>
+
+      <tr class="row-alt"><td class="col-no">D12</td><td colspan="4" class="ques">Rencana penanganan & pengangkutan sampah material tersedia.</td></tr>
+      <tr class="subrow row-alt"><td></td><td><div class="yn">
+        <label><input type="radio" name="D12" value="yes"> Ya</label>
+        <label><input type="radio" name="D12" value="no"> Tidak</label>
+        <label><input type="radio" name="D12" value="na"> N/A</label>
+      </div></td><td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td></tr>
+
+      <tr><td class="col-no">D13</td><td colspan="4" class="ques">Kendaraan pengangkut sampah/material direncanakan.</td></tr>
+      <tr class="subrow"><td></td><td><div class="yn">
+        <label><input type="radio" name="D13" value="yes"> Ya</label>
+        <label><input type="radio" name="D13" value="no"> Tidak</label>
+        <label><input type="radio" name="D13" value="na"> N/A</label>
+      </div></td><td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td></tr>
+
+      <tr class="row-alt"><td class="col-no">D14</td><td colspan="4" class="ques">Program kebersihan area penyimpanan (housekeeping) berjalan.</td></tr>
+      <tr class="subrow row-alt"><td></td><td><div class="yn">
+        <label><input type="radio" name="D14" value="yes"> Ya</label>
+        <label><input type="radio" name="D14" value="no"> Tidak</label>
+        <label><input type="radio" name="D14" value="na"> N/A</label>
+      </div></td><td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td></tr>
+
+      <tr><td class="col-no">D15</td><td colspan="4" class="ques">Program Room Free Dust & Floor Protection tersedia.</td></tr>
+      <tr class="subrow"><td></td><td><div class="yn">
+        <label><input type="radio" name="D15" value="yes"> Ya</label>
+        <label><input type="radio" name="D15" value="no"> Tidak</label>
+        <label><input type="radio" name="D15" value="na"> N/A</label>
+      </div></td><td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td></tr>
     </tbody>
   </table>
 
@@ -323,141 +268,85 @@
     <div class="score-card"><h4>Score B</h4><div class="score-val" id="scoreB">0%</div></div>
     <div class="score-card"><h4>Score C</h4><div class="score-val" id="scoreC">0%</div></div>
     <div class="score-card"><h4>Score D</h4><div class="score-val" id="scoreD">0%</div></div>
-    <div class="score-card">
-      <h4>Total Score <span id="badge" class="badge">0/100</span></h4>
-      <div class="score-val" id="totalScore">0%</div>
-    </div>
+    <div class="score-card"><h4>Total Score <span id="badge" class="badge">0/100</span></h4><div class="score-val" id="totalScore">0%</div></div>
   </div>
 
   <!-- Photos -->
-  <div class="photos" id="photos">
-    <!-- 4 slots like the sample -->
-    <div class="photo-card" data-slot="1">
-      <div class="photo-stage"><span>Tambahkan Foto</span></div>
-      <div class="photo-actions">
-        <input type="file" accept="image/*" />
-        <input type="text" placeholder="Deskripsi foto…" />
-      </div>
-    </div>
-    <div class="photo-card" data-slot="2">
-      <div class="photo-stage"><span>Tambahkan Foto</span></div>
-      <div class="photo-actions">
-        <input type="file" accept="image/*" />
-        <input type="text" placeholder="Deskripsi foto…" />
-      </div>
-    </div>
-    <div class="photo-card" data-slot="3">
-      <div class="photo-stage"><span>Tambahkan Foto</span></div>
-      <div class="photo-actions">
-        <input type="file" accept="image/*" />
-        <input type="text" placeholder="Deskripsi foto…" />
-      </div>
-    </div>
-    <div class="photo-card" data-slot="4">
-      <div class="photo-stage"><span>Tambahkan Foto</span></div>
-      <div class="photo-actions">
-        <input type="file" accept="image/*" />
-        <input type="text" placeholder="Deskripsi foto…" />
-      </div>
-    </div>
+  <div class="photos">
+    <div class="photo-card"><div class="photo-stage"><span>Tambahkan Foto</span></div><div class="photo-actions"><input type="file" accept="image/*"/><input type="text" placeholder="Deskripsi foto…"/></div></div>
+    <div class="photo-card"><div class="photo-stage"><span>Tambahkan Foto</span></div><div class="photo-actions"><input type="file" accept="image/*"/><input type="text" placeholder="Deskripsi foto…"/></div></div>
+    <div class="photo-card"><div class="photo-stage"><span>Tambahkan Foto</span></div><div class="photo-actions"><input type="file" accept="image/*"/><input type="text" placeholder="Deskripsi foto…"/></div></div>
+    <div class="photo-card"><div class="photo-stage"><span>Tambahkan Foto</span></div><div class="photo-actions"><input type="file" accept="image/*"/><input type="text" placeholder="Deskripsi foto…"/></div></div>
   </div>
 
   <div class="toolbar">
-    <button class="btn secondary" id="resetBtn">Reset</button>
     <button class="btn" id="printBtn">Print PDF (A4)</button>
+    <button class="btn" id="resetBtn" style="background:#0ea5e9">Reset</button>
   </div>
-
 </div>
 
 <script>
-  // ---- Helpers: scoring (Yes=1, No=0, N/A excluded) ----
-  function sectionScore(sectionEl){
-    const radios = sectionEl.querySelectorAll('input[type=radio]');
-    const groups = new Map();
-    radios.forEach(r=>{
-      const nm = r.name;
-      if(!groups.has(nm)) groups.set(nm, []);
-      groups.get(nm).push(r);
+  // ---- scoring (Yes=1, No=0, N/A & kosong: exclude) ----
+  function scoreSection(sec){
+    const names = new Set();
+    sec.querySelectorAll('input[type=radio]').forEach(r=>names.add(r.name));
+    let yes=0, denom=0;
+    names.forEach(n=>{
+      const chosen = sec.querySelector(`input[name="${n}"]:checked`);
+      if(!chosen) return;                 // belum dijawab = exclude
+      if(chosen.value==='na') return;     // N/A = exclude
+      denom++; if(chosen.value==='yes') yes++;
     });
-    let yes=0, applicable=0;
-    groups.forEach(arr=>{
-      const chosen = arr.find(x=>x.checked);
-      if(!chosen) return; // unanswered -> exclude (treat like N/A)
-      if(chosen.value === 'na') return; // NA doesn't count in denominator
-      applicable++;
-      if(chosen.value === 'yes') yes++;
-    });
-    if(applicable===0) return 0;
-    return Math.round((yes/applicable)*100);
+    return denom? Math.round(100*yes/denom):0;
   }
+  function refreshScores(){
+    const A = document.querySelector('tbody[data-section="A"]');
+    const B = document.querySelector('tbody[data-section="B"]');
+    const C = document.querySelector('tbody[data-section="C"]');
+    const D = document.querySelector('tbody[data-section="D"]');
+    const sA = scoreSection(A), sB = scoreSection(B), sC = scoreSection(C), sD = scoreSection(D);
 
-  function updateScores(){
-    const secA = document.querySelector('tbody[data-section=A]');
-    const secB = document.querySelector('tbody[data-section=B]');
-    const secC = document.querySelector('tbody[data-section=C]');
-    const secD = document.querySelector('tbody[data-section=D]');
-    const sA = sectionScore(secA);
-    const sB = sectionScore(secB);
-    const sC = sectionScore(secC);
-    const sD = sectionScore(secD);
-    // total across all answered non-NA items
-    function totals(){
-      const all = [secA,secB,secC,secD];
-      let yes=0, applicable=0;
-      all.forEach(sec=>{
-        const byName = {};
-        sec.querySelectorAll('input[type=radio]').forEach(r=>{
-          byName[r.name] = byName[r.name] || [];
-          byName[r.name].push(r);
-        });
-        Object.values(byName).forEach(arr=>{
-          const chosen = arr.find(x=>x.checked);
-          if(!chosen) return;
-          if(chosen.value==='na') return;
-          applicable++;
-          if(chosen.value==='yes') yes++;
-        });
+    // total
+    const all = [A,B,C,D];
+    let yes=0, denom=0;
+    all.forEach(sec=>{
+      const names = new Set();
+      sec.querySelectorAll('input[type=radio]').forEach(r=>names.add(r.name));
+      names.forEach(n=>{
+        const chosen = sec.querySelector(`input[name="${n}"]:checked`);
+        if(!chosen || chosen.value==='na') return;
+        denom++; if(chosen.value==='yes') yes++;
       });
-      if(applicable===0) return 0;
-      return Math.round(100*yes/applicable);
-    }
-    const t = totals();
+    });
+    const total = denom? Math.round(100*yes/denom):0;
 
     document.getElementById('scoreA').textContent = sA + '%';
     document.getElementById('scoreB').textContent = sB + '%';
     document.getElementById('scoreC').textContent = sC + '%';
     document.getElementById('scoreD').textContent = sD + '%';
-    document.getElementById('totalScore').textContent = t + '%';
+    document.getElementById('totalScore').textContent = total + '%';
+
     const badge = document.getElementById('badge');
-    badge.textContent = `${t}/100`;
-    badge.className = 'badge ' + (t>=80?'good':'bad');
+    badge.textContent = `${total}/100`;
+    badge.classList.remove('good','bad');
+    badge.classList.add(total>=80 ? 'good' : 'bad');
   }
+  document.querySelectorAll('#chkTable input[type=radio]').forEach(r=>r.addEventListener('change', refreshScores));
+  refreshScores();
 
-  // bind all radios
-  document.querySelectorAll('#chkTable input[type=radio]').forEach(r=>{
-    r.addEventListener('change', updateScores);
-  });
-  updateScores();
-
-  // ---- Photos: proportional preview + caption ----
+  // photo preview
   document.querySelectorAll('.photo-card input[type=file]').forEach(inp=>{
     inp.addEventListener('change', e=>{
-      const file = e.target.files[0];
-      if(!file) return;
+      const f = e.target.files[0]; if(!f) return;
       const stage = e.target.closest('.photo-card').querySelector('.photo-stage');
-      const img = document.createElement('img');
-      img.alt = 'Photo';
-      const reader = new FileReader();
-      reader.onload = ev=>{
-        stage.innerHTML='';
-        img.src = ev.target.result;
-        stage.appendChild(img);
-      };
-      reader.readAsDataURL(file);
+      const img = document.createElement('img'); const rd = new FileReader();
+      rd.onload = ev=>{ stage.innerHTML=''; img.src = ev.target.result; stage.appendChild(img); };
+      rd.readAsDataURL(f);
     });
   });
 
-  // ---- Reset ----
+  // print & reset
+  document.getElementById('printBtn').addEventListener('click', ()=>window.print());
   document.getElementById('resetBtn').addEventListener('click', ()=>{
     document.querySelectorAll('#chkTable input[type=radio]').forEach(r=>r.checked=false);
     document.querySelectorAll('.remarks').forEach(t=>t.value='');
@@ -466,12 +355,8 @@
       card.querySelector('input[type=file]').value='';
       card.querySelector('input[type=text]').value='';
     });
-    updateScores();
-    window.scrollTo({top:0,behavior:'smooth'});
+    refreshScores(); window.scrollTo({top:0,behavior:'smooth'});
   });
-
-  // ---- Print ----
-  document.getElementById('printBtn').addEventListener('click', ()=>window.print());
 </script>
 </body>
 </html>
