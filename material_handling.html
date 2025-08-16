@@ -432,7 +432,7 @@
   <!-- Photos (akan menjadi halaman tersendiri saat print) -->
   <div class="photos" id="photos">
     <div class="photo-card" data-slot="1">
-      <div class="photo-stage"><span>Tambahkan Foto</span></div>
+      <div class="photo-stage"><span>Add Photo</span></div>
       <div class="photo-actions">
         <input type="file" accept="image/*" />
         <input type="text" class="photo-desc" maxlength="58" placeholder="Deskripsi foto (maks 58)…" />
@@ -440,7 +440,7 @@
       <div class="photo-desc-print"></div>
     </div>
     <div class="photo-card" data-slot="2">
-      <div class="photo-stage"><span>Tambahkan Foto</span></div>
+      <div class="photo-stage"><span>Add Photo</span></div>
       <div class="photo-actions">
         <input type="file" accept="image/*" />
         <input type="text" class="photo-desc" maxlength="58" placeholder="Deskripsi foto (maks 58)…" />
@@ -448,7 +448,7 @@
       <div class="photo-desc-print"></div>
     </div>
     <div class="photo-card" data-slot="3">
-      <div class="photo-stage"><span>Tambahkan Foto</span></div>
+      <div class="photo-stage"><span>Add Photo</span></div>
       <div class="photo-actions">
         <input type="file" accept="image/*" />
         <input type="text" class="photo-desc" maxlength="58" placeholder="Deskripsi foto (maks 58)…" />
@@ -456,7 +456,7 @@
       <div class="photo-desc-print"></div>
     </div>
     <div class="photo-card" data-slot="4">
-      <div class="photo-stage"><span>Tambahkan Foto</span></div>
+      <div class="photo-stage"><span>Add Photo</span></div>
       <div class="photo-actions">
         <input type="file" accept="image/*" />
         <input type="text" class="photo-desc" maxlength="58" placeholder="Deskripsi foto (maks 58)…" />
@@ -728,7 +728,7 @@
     document.querySelectorAll('#chkTable input[type=radio]').forEach(r=>r.checked=false);
     document.querySelectorAll('.remarks').forEach(t=>{ t.value=''; updateCounter(t); });
     document.querySelectorAll('.photo-card').forEach(card=>{
-      card.querySelector('.photo-stage').innerHTML='<span>Tambahkan Foto</span>';
+      card.querySelector('.photo-stage').innerHTML='<span>Add Photo</span>';
       const f = card.querySelector('input[type=file]'); if(f) f.value='';
       const d = card.querySelector('.photo-desc'); if(d){ d.value=''; }
       const pb = card.querySelector('.photo-desc-print'); if(pb){ pb.textContent=''; }
