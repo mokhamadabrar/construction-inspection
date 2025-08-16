@@ -3,50 +3,46 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Material Handling Checklist — v2</title>
+<title>Material Handling Checklist — Final</title>
 <style>
   :root{
     --brand:#6a1b9a; --row:#f7f9fc; --header:#0ea5e9; --border:#d1d5db;
     --ok:#16a34a; --bad:#ef4444; --muted:#6b7280;
   }
   *{box-sizing:border-box}
-  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;
-       margin:0;color:#111827;background:#fff}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;margin:0;color:#111827;background:#fff}
   .page{max-width:1050px;margin:16px auto;padding:16px}
-  .title{ color:var(--brand); text-align:center; font-weight:800;
-          font-size:clamp(18px,4vw,28px); margin:0 0 10px}
-  .meta{display:grid;gap:8px 16px;grid-template-columns:repeat(6,1fr);font-size:13px}
+  .title{color:var(--brand);text-align:center;font-weight:800;font-size:clamp(18px,4vw,28px);margin:0 0 10px}
+  .meta{display:grid;gap:8px 16px;grid-template-columns:repeat(6,1fr);font-size:13px;margin-bottom:8px}
   .meta .label{color:var(--muted)}
   .meta input{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px}
 
   /* table */
-  .chk-table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid var(--border);border-radius:10px;margin-top:14px}
+  .chk-table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid var(--border);border-radius:10px;margin-top:6px}
   .chk-table thead th{background:var(--header);color:#fff;padding:10px 8px;font-weight:700;font-size:13px;text-align:center;border-right:1px solid var(--header)}
   .chk-table thead th:last-child{border-right:none}
   .section-head{background:#e2f3fb;color:#0b4a6f;font-weight:700;padding:8px;font-size:13px;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
   .col-no{width:70px;text-align:center;font-weight:800;color:#0b4a6f}
-  .col-ques{width:auto}
-  .col-yn{width:70px;text-align:center}
   .chk-table td{padding:8px;border-top:1px solid var(--border)}
   .row-alt{background:var(--row)}
   .ques{font-size:13px;line-height:1.35}
-  .yn{display:flex;gap:6px;justify-content:center;align-items:center}
+  .yn{display:flex;gap:10px;align-items:center}
+  .yn label{display:flex;gap:6px;align-items:center;font-size:13px}
   .yn input{width:18px;height:18px}
   .remarks{width:100%;min-height:40px;border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:12px;resize:vertical}
-  /* second line (radio+remarks) should visually group */
   .subrow td{border-top:none;padding-top:4px;padding-bottom:10px}
   .remarks-cell{padding:6px 8px 10px}
 
   /* scores */
-  .scores{display:grid;gap:10px;grid-template-columns:repeat(5,1fr);margin:14px 0 6px}
+  .scores{display:grid;gap:10px;grid-template-columns:repeat(5,1fr);margin:12px 0 6px}
   .score-card{border:1px solid var(--border);border-radius:10px;background:#fafafa;padding:10px}
   .score-card h4{margin:0 0 8px;font-size:13px;color:#0b4a6f}
   .score-val{font-weight:800;font-size:18px}
-  .badge{border-radius:999px;padding:3px 8px;font-size:11px;margin-left:8px;color:#fff; background:#111827}
+  .badge{border-radius:999px;padding:3px 8px;font-size:11px;margin-left:8px;color:#fff;background:#111827}
   .good{background:var(--ok)!important} .bad{background:var(--bad)!important}
 
   /* photos */
-  .photos{display:grid;gap:12px;grid-template-columns:repeat(2,1fr);margin-top:12px}
+  .photos{display:grid;gap:12px;grid-template-columns:repeat(2,1fr);margin-top:10px}
   .photo-card{background:#4f81bd;border-radius:14px;padding:10px;color:#fff;min-height:210px;display:flex;flex-direction:column;gap:8px}
   .photo-stage{flex:1;border:2px dashed rgba(255,255,255,.7);border-radius:12px;display:grid;place-items:center;overflow:hidden;background:rgba(255,255,255,.06)}
   .photo-stage img{max-width:100%;max-height:100%;object-fit:contain;display:block}
@@ -55,9 +51,10 @@
   .photo-actions input[type=text]{flex:1;min-width:120px;border:none;border-radius:8px;padding:6px 8px;font-size:12px}
 
   /* responsive */
-  @media (max-width:800px){ .meta{grid-template-columns:repeat(2,1fr)} .col-yn{width:64px}}
-  @media (max-width:640px){ .photos{grid-template-columns:1fr} .col-no{width:64px}}
-  /* print */
+  @media (max-width:800px){ .meta{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:640px){ .photos{grid-template-columns:1fr} .col-no{width:64px} }
+
+  /* print: A4, remarks printed as text */
   @page{size:A4 portrait;margin:12mm}
   @media print{
     .toolbar{display:none!important}
@@ -65,6 +62,20 @@
     .photo-card{min-height:150px}
     .chk-table td{padding:6px}
     .score-val{font-size:16px}
+    /* ----- ensure textarea content prints fully ----- */
+    textarea.remarks{
+      border:none !important;
+      outline:none !important;
+      resize:none !important;
+      overflow:visible !important;
+      white-space:pre-wrap !important; /* keep line breaks */
+      font-size:12px !important;
+      background:transparent !important;
+      height:auto !important;
+      min-height:unset !important;
+      -webkit-appearance:none;
+      appearance:none;
+    }
   }
 </style>
 </head>
@@ -83,10 +94,10 @@
     <thead>
       <tr>
         <th class="col-no">No.</th>
-        <th class="col-ques">Pertanyaan</th>
-        <th class="col-yn">YES</th>
-        <th class="col-yn">NO</th>
-        <th class="col-yn">N/A</th>
+        <th>Pertanyaan</th>
+        <th>YES</th>
+        <th>NO</th>
+        <th>N/A</th>
       </tr>
     </thead>
 
@@ -97,9 +108,7 @@
       <!-- A1 -->
       <tr class="row-alt">
         <td class="col-no">A1</td>
-        <td class="col-ques" colspan="4">
-          <div class="ques">Rencana & Penempatan: MSRA sesuai lokasi, jadwal, dan spesifikasi area penyimpanan telah ditetapkan dan diverifikasi kesesuaiannya.</div>
-        </td>
+        <td colspan="4"><div class="ques">Rencana & Penempatan: MSRA sesuai lokasi, jadwal, dan spesifikasi area penyimpanan telah ditetapkan dan diverifikasi.</div></td>
       </tr>
       <tr class="subrow row-alt">
         <td></td>
@@ -110,36 +119,28 @@
             <label><input type="radio" name="A1" value="na"> N/A</label>
           </div>
         </td>
-        <td colspan="3" class="remarks-cell">
-          <textarea class="remarks" placeholder="Remarks (opsional)…"></textarea>
-        </td>
+        <td colspan="3" class="remarks-cell"><textarea class="remarks" placeholder="Remarks (opsional)…"></textarea></td>
       </tr>
 
       <!-- A2 -->
       <tr>
         <td class="col-no">A2</td>
-        <td colspan="4">
-          <div class="ques">Logistik & Akses: Berat/dimensi material, metode movement & alat angkat, rute transporter (journey management), kondisi jalan, serta staging area telah di-assessment.</div>
-        </td>
+        <td colspan="4"><div class="ques">Logistik & Akses: Berat/dimensi material, metode movement & alat angkat, rute transporter, kondisi jalan, dan staging area telah di-assessment.</div></td>
       </tr>
       <tr class="subrow">
         <td></td>
-        <td>
-          <div class="yn">
-            <label><input type="radio" name="A2" value="yes"> Ya</label>
-            <label><input type="radio" name="A2" value="no"> Tidak</label>
-            <label><input type="radio" name="A2" value="na"> N/A</label>
-          </div>
-        </td>
+        <td><div class="yn">
+          <label><input type="radio" name="A2" value="yes"> Ya</label>
+          <label><input type="radio" name="A2" value="no"> Tidak</label>
+          <label><input type="radio" name="A2" value="na"> N/A</label>
+        </div></td>
         <td colspan="3" class="remarks-cell"><textarea class="remarks"></textarea></td>
       </tr>
 
       <!-- A3 -->
       <tr class="row-alt">
         <td class="col-no">A3</td>
-        <td colspan="4">
-          <div class="ques">Keselamatan & Segregasi: Jalur pejalan kaki memenuhi standar & terpisah dari jalur material; penghalang fisik tersedia; bahaya (mis. kabel listrik, hambatan) diidentifikasi.</div>
-        </td>
+        <td colspan="4"><div class="ques">Keselamatan & Segregasi: Jalur pejalan kaki memenuhi standar & terpisah dari jalur material; penghalang fisik tersedia; bahaya (kabel listrik, hambatan) diidentifikasi.</div></td>
       </tr>
       <tr class="subrow row-alt">
         <td></td>
@@ -154,9 +155,7 @@
       <!-- A4 -->
       <tr>
         <td class="col-no">A4</td>
-        <td colspan="4">
-          <div class="ques">Manual handling: batas maksimum per orang 18.14 kg; material panjang/ >3 m diangkat lebih dari satu orang.</div>
-        </td>
+        <td colspan="4"><div class="ques">Manual handling: batas maksimum per orang 18.14 kg; material panjang atau &gt;3 m diangkat lebih dari satu orang.</div></td>
       </tr>
       <tr class="subrow">
         <td></td>
@@ -279,9 +278,9 @@
     <div class="photo-card"><div class="photo-stage"><span>Tambahkan Foto</span></div><div class="photo-actions"><input type="file" accept="image/*"/><input type="text" placeholder="Deskripsi foto…"/></div></div>
   </div>
 
-  <div class="toolbar">
-    <button class="btn" id="printBtn">Print PDF (A4)</button>
-    <button class="btn" id="resetBtn" style="background:#0ea5e9">Reset</button>
+  <div class="toolbar" style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap">
+    <button class="btn" id="printBtn" style="border:none;border-radius:10px;padding:10px 14px;font-weight:700;background:#111827;color:#fff">Print PDF (A4)</button>
+    <button class="btn" id="resetBtn" style="border:none;border-radius:10px;padding:10px 14px;font-weight:700;background:#0ea5e9;color:#fff">Reset</button>
   </div>
 </div>
 
@@ -293,8 +292,7 @@
     let yes=0, denom=0;
     names.forEach(n=>{
       const chosen = sec.querySelector(`input[name="${n}"]:checked`);
-      if(!chosen) return;                 // belum dijawab = exclude
-      if(chosen.value==='na') return;     // N/A = exclude
+      if(!chosen || chosen.value==='na') return;
       denom++; if(chosen.value==='yes') yes++;
     });
     return denom? Math.round(100*yes/denom):0;
@@ -306,10 +304,8 @@
     const D = document.querySelector('tbody[data-section="D"]');
     const sA = scoreSection(A), sB = scoreSection(B), sC = scoreSection(C), sD = scoreSection(D);
 
-    // total
-    const all = [A,B,C,D];
     let yes=0, denom=0;
-    all.forEach(sec=>{
+    [A,B,C,D].forEach(sec=>{
       const names = new Set();
       sec.querySelectorAll('input[type=radio]').forEach(r=>names.add(r.name));
       names.forEach(n=>{
@@ -325,7 +321,6 @@
     document.getElementById('scoreC').textContent = sC + '%';
     document.getElementById('scoreD').textContent = sD + '%';
     document.getElementById('totalScore').textContent = total + '%';
-
     const badge = document.getElementById('badge');
     badge.textContent = `${total}/100`;
     badge.classList.remove('good','bad');
