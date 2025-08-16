@@ -3,27 +3,21 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Material Handling Checklist — Final v14 (PWA)</title>
+<title>Material Handling Checklist — Final v15 (Simple)</title>
 <meta name="theme-color" content="#111827"/>
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="https://mokhamadabrar.github.io/construction-inspection/Logo-JO.png">
 <style>
   :root{ --brand:#6a1b9a; --row:#f7f9fc; --header:#0ea5e9; --border:#d1d5db; --ok:#16a34a; --bad:#ef4444; --muted:#6b7280; }
   *{box-sizing:border-box}
   body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;margin:0;color:#111827;background:#fff}
   .page{max-width:1050px;margin:16px auto;padding:16px}
   .title{color:var(--brand);text-align:center;font-weight:800;font-size:clamp(18px,4vw,28px);margin:0 0 6px}
+
+  /* LOGO */
   .logo-wrap{display:flex;justify-content:center;align-items:center;margin:6px 0 12px}
   .logo-wrap img{width:min(40vw,260px);height:auto;max-height:120px}
   .logo-caption{font-size:12px;color:#374151;text-align:center;margin-top:4px}
 
-  /* Install banner */
-  .install-banner{display:none;gap:8px;align-items:center;justify-content:space-between;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:10px 12px;margin:8px 0}
-  .install-banner.show{display:flex}
-  .install-banner .msg{font-size:13px;color:#7c2d12}
-  .install-banner .actions{display:flex;gap:8px}
-  .install-btn{border:none;border-radius:10px;padding:8px 12px;font-weight:700;color:#fff;background:#0ea5e9}
-
+  /* Language buttons */
   .langbar{display:flex;justify-content:flex-end;gap:10px;align-items:center;margin:-4px 0 8px;flex-wrap:wrap}
   .langbar .hint{font-size:12px;color:#374151;margin-right:4px}
   .lang-btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:999px;background:#fff;padding:8px 12px;cursor:pointer;user-select:none;box-shadow:0 1px 2px rgba(0,0,0,.04);min-height:44px}
@@ -32,10 +26,12 @@
   .lang-btn .lbl{font-size:13px;color:#111}
   @media (max-width:480px){ .lang-btn{padding:8px 10px} .lang-btn .lbl{display:none} .lang-btn img{width:28px} }
 
+  /* Meta */
   .meta{display:grid;gap:8px 16px;grid-template-columns:repeat(6,1fr);font-size:13px;margin-bottom:8px}
   .meta .label{color:#374151}
   .meta input{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px}
 
+  /* table */
   .chk-table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid var(--border);border-radius:10px;margin-top:6px}
   .chk-table thead th{background:var(--header);color:#fff;padding:10px 8px;font-weight:700;font-size:13px;text-align:center;border-right:1px solid var(--header)}
   .chk-table thead th:last-child{border-right:none}
@@ -48,6 +44,7 @@
   .yn label{display:flex;gap:6px;align-items:center;font-size:13px}
   .yn input{width:18px;height:18px}
 
+  /* remarks */
   .remarks{width:100%;min-height:40px;border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:12px;resize:vertical}
   .subrow td{border-top:none;padding-top:4px;padding-bottom:8px}
   .remarks-cell{padding:6px 8px 6px}
@@ -55,6 +52,7 @@
   .counter{font-size:11px;color:#6b7280}
   .counter.limit{color:var(--bad);font-weight:700}
 
+  /* scores */
   .scores{display:grid;gap:10px;grid-template-columns:repeat(5,1fr);margin:12px 0 6px}
   .score-card{border:1px solid var(--border);border-radius:10px;background:#fafafa;padding:10px}
   .score-card h4{margin:0 0 8px;font-size:13px;color:#0b4a6f}
@@ -62,6 +60,7 @@
   .badge{border-radius:999px;padding:3px 8px;font-size:11px;margin-left:8px;color:#fff;background:#111827}
   .good{background:var(--ok)!important} .bad{background:var(--bad)!important}
 
+  /* photos (UI) */
   .photos{display:grid;gap:12px;grid-template-columns:repeat(2,1fr);margin-top:10px}
   .photo-card{background:#4f81bd;border-radius:14px;padding:10px;color:#fff;min-height:210px;display:flex;flex-direction:column;gap:8px;break-inside:avoid}
   .photo-stage{flex:1;border:2px dashed rgba(255,255,255,.7);border-radius:12px;display:grid;place-items:center;overflow:hidden;background:rgba(255,255,255,.06)}
@@ -71,10 +70,12 @@
   .photo-desc{flex:1;min-width:120px;border:none;border-radius:8px;padding:6px 8px;font-size:12px}
   .photo-desc-print{display:none;margin-top:6px;font-size:12px;line-height:1.3;background:rgba(255,255,255,.12);padding:4px 6px;border-radius:6px}
 
+  /* footer */
   .footer{margin-top:14px;text-align:center;font-size:12px;color:#374151}
   .footer .line{height:1px;background:var(--border);margin:10px 0}
   .footer b{color:#111827}
 
+  /* toolbar */
   .toolbar{display:flex;gap:10px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}
   .btn{border:none;border-radius:10px;padding:10px 14px;font-weight:700;color:#fff}
   .btn.print{background:#111827}
@@ -82,9 +83,11 @@
   .btn.wa{background:#25D366}
   .btn[disabled]{opacity:.7;cursor:progress}
 
+  /* responsive */
   @media (max-width:800px){ .meta{grid-template-columns:repeat(2,1fr)} }
   @media (max-width:640px){ .photos{grid-template-columns:1fr} .col-no{width:64px} }
 
+  /* print (untuk tombol Print PDF) */
   @page{size:A4 portrait;margin:12mm}
   @media print{
     .toolbar{display:none!important}
@@ -92,6 +95,8 @@
     .score-val{font-size:16px}
     .chk-table td{padding:6px}
     .logo-caption{display:none}
+
+    /* remarks sebagai teks */
     textarea.remarks{
       border:none !important; outline:none !important; resize:none !important;
       overflow:visible !important; white-space:pre-wrap !important;
@@ -100,8 +105,20 @@
       -webkit-appearance:none; appearance:none;
     }
     .counter{display:none}
-    .photos{page-break-before: always; grid-template-columns: 1fr 1fr; gap: 6mm; margin-top: 0}
-    .photo-card{background:#fff;color:#111;border:1px solid #ddd;padding:5mm;border-radius:6px;min-height:auto;height:120mm;break-inside:avoid;page-break-inside:avoid}
+
+    /* Halaman foto khusus, rapat 1 halaman */
+    .photos{
+      page-break-before: always;
+      grid-template-columns: 1fr 1fr;
+      gap: 6mm;
+      margin-top: 0;
+    }
+    .photo-card{
+      background:#fff; color:#111;
+      border:1px solid #ddd; padding:5mm; border-radius:6px;
+      min-height:auto; height:120mm;
+      break-inside: avoid; page-break-inside: avoid;
+    }
     .photo-stage{ border:1px solid #ccc; background:#fff; border-radius:4px }
     .photo-actions{display:none}
     .photo-desc-print{ display:block; font-size:11px; color:#111; background:transparent; padding:0; margin-top:3mm }
@@ -113,6 +130,7 @@
 <div class="page" id="appRoot">
   <div class="title">MATERIAL HANDLING CHECKLIST</div>
 
+  <!-- LOGO -->
   <div class="logo-wrap" aria-label="Logo PT Jaya Obayashi">
     <div>
       <img crossorigin="anonymous" referrerpolicy="no-referrer"
@@ -122,15 +140,7 @@
     </div>
   </div>
 
-  <!-- Install banner -->
-  <div id="installBanner" class="install-banner" role="status" aria-live="polite">
-    <div class="msg">Untuk kirim PDF langsung via WhatsApp, instal aplikasi web ini ke Home Screen dulu (PWA).</div>
-    <div class="actions">
-      <button id="btnInstall" class="install-btn">Install App</button>
-    </div>
-  </div>
-
-  <!-- Language Buttons -->
+  <!-- Translate -->
   <div class="langbar" role="group" aria-label="Auto translate">
     <span class="hint">Auto translate:</span>
     <button id="btnID" type="button" class="lang-btn" aria-pressed="false" aria-label="Indonesia">
@@ -150,9 +160,10 @@
     <div class="label" data-i18n="label_date">Date</div><input id="inp-date" type="date"/>
     <div class="label" data-i18n="label_location">Location</div><input id="inp-location" placeholder="Lokasi"/>
     <div class="label" data-i18n="label_contractor">Kontraktor</div><input id="inp-contractor" placeholder="Nama Kontraktor"/>
+    <div class="label">WhatsApp No.</div><input id="inp-wa" placeholder="+62812xxxxxxx"/>
   </div>
 
-  <!-- === TABEL CHECKLIST persis seperti versi Anda === -->
+  <!-- Checklist Table (DESKRIPSI PERTANYAAN TIDAK DIUBAH) -->
   <table class="chk-table" id="chkTable">
     <thead>
       <tr>
@@ -395,6 +406,7 @@
     </tbody>
   </table>
 
+  <!-- Scores -->
   <div class="scores">
     <div class="score-card"><h4>Score A</h4><div class="score-val" id="scoreA">0%</div></div>
     <div class="score-card"><h4>Score B</h4><div class="score-val" id="scoreB">0%</div></div>
@@ -403,6 +415,7 @@
     <div class="score-card"><h4>Total Score <span id="badge" class="badge">0/100</span></h4><div class="score-val" id="totalScore">0%</div></div>
   </div>
 
+  <!-- Footer -->
   <div class="footer" role="contentinfo">
     <div class="line"></div>
     <div>Created &amp; Review by</div>
@@ -446,6 +459,7 @@
     </div>
   </div>
 
+  <!-- Toolbar -->
   <div class="toolbar">
     <button class="btn wa" id="waBtn">Send by WhatsApp</button>
     <button class="btn print" id="printBtn">Print PDF (A4)</button>
@@ -453,51 +467,19 @@
   </div>
 </div>
 
+<!-- html2pdf (untuk ekspor PDF saat WA Simple Mode) -->
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 <script>
 (function(){
   /* ===== helpers ===== */
   const qsa=(s,r)=> (r||document).querySelectorAll(s);
   const qs=(s,r)=> (r||document).querySelector(s);
 
-  /* ===== PWA: service worker & install prompt ===== */
-  if ('serviceWorker' in navigator){
-    navigator.serviceWorker.register('./sw.js').catch(()=>{});
-  }
-  let deferredPrompt=null;
-  window.addEventListener('beforeinstallprompt', (e)=>{
-    e.preventDefault();
-    deferredPrompt=e;
-    showInstallBanner(true);
-  });
-  function showInstallBanner(show){
-    const b=qs('#installBanner'); if(!b) return;
-    // tampilkan jika: tidak standalone ATAU share files tidak didukung
-    const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-    const canFileShare = ('canShare' in navigator) && (function(){ try{ return navigator.canShare({ files:[ new File(['x'],'x.txt',{type:'text/plain'}) ] }); }catch(e){ return false; }})();
-    if (show && (!standalone || !canFileShare)) b.classList.add('show'); else b.classList.remove('show');
-  }
-  qs('#btnInstall').addEventListener('click', async ()=>{
-    if (!deferredPrompt){ alert('Jika tombol tidak muncul, pilih “Add to Home screen” dari menu Chrome.'); return; }
-    deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-    deferredPrompt=null;
-    showInstallBanner(false);
-  });
-
-  /* ===== language (ID default) ===== */
+  /* ===== language (default: ID) ===== */
   let currentLang='id';
   try{ currentLang = (localStorage.getItem('mhc_lang')==='en')?'en':'id'; }catch(e){}
   const getLang=()=>currentLang;
-
-  function enforceMaxWithAlert(el, MAX, fieldName){
-    if (el.value.length>MAX){
-      el.value = el.value.slice(0,MAX);
-      alert((getLang()==='en')?`Maximum ${MAX} characters for ${fieldName}.`:`Maksimal ${MAX} karakter untuk ${fieldName}.`);
-      return true;
-    } return false;
-  }
-  const MAX_REMARKS=70, MAX_DESC=58;
 
   /* ===== scoring ===== */
   function scoreSection(sec){
@@ -520,19 +502,30 @@
   }
   qsa('#chkTable input[type=radio]').forEach(r=>r.addEventListener('change',refreshScores)); refreshScores();
 
-  /* ===== counters & inputs ===== */
+  /* ===== limits + counters ===== */
+  function enforceMaxWithAlert(el, MAX, fieldName){
+    if (el.value.length>MAX){
+      el.value = el.value.slice(0,MAX);
+      alert((getLang()==='en')?`Maximum ${MAX} characters for ${fieldName}.`:`Maksimal ${MAX} karakter untuk ${fieldName}.`);
+      return true;
+    } return false;
+  }
+  const MAX_REMARKS=70, MAX_DESC=58;
+
   qsa('textarea.remarks').forEach(a=>{
     a.setAttribute('maxlength',String(MAX_REMARKS));
     const wrap=a.closest('.remarks-wrap'); const counter=wrap.querySelector('.counter');
     const upd=()=>{ enforceMaxWithAlert(a,MAX_REMARKS,'Remarks'); const len=a.value.length; counter.textContent=`${len}/${MAX_REMARKS}`; counter.classList.toggle('limit',len>=MAX_REMARKS); };
     a.addEventListener('input',upd); a.addEventListener('paste',()=>setTimeout(upd,0)); upd();
   });
+
   qsa('.photo-card input[type=file]').forEach(inp=>{
     inp.addEventListener('change',e=>{
       const f=e.target.files[0]; if(!f) return;
       const stage=e.target.closest('.photo-card').querySelector('.photo-stage');
       const img=document.createElement('img'); const rd=new FileReader();
-      rd.onload=ev=>{ stage.innerHTML=''; img.src=ev.target.result; stage.appendChild(img); }; rd.readAsDataURL(f);
+      rd.onload=ev=>{ stage.innerHTML=''; img.src=ev.target.result; stage.appendChild(img); };
+      rd.readAsDataURL(f);
     });
   });
   qsa('.photo-card .photo-desc').forEach(desc=>{
@@ -541,7 +534,7 @@
     desc.setAttribute('maxlength',String(MAX_DESC)); desc.addEventListener('input',sync); desc.addEventListener('paste',()=>setTimeout(sync,0)); sync();
   });
 
-  /* ===== i18n label/question (pakai baseline ID + EN) ===== */
+  /* ===== i18n (ID baseline + EN override) ===== */
   function getQMap(){
     const map={}; qsa('.chk-table tbody tr').forEach(tr=>{ const no=tr.querySelector('.col-no'); const q=tr.querySelector('.ques'); if(no&&q){ map[no.textContent.replace(/\s+/g,'').trim()]=q; }});
     return map;
@@ -609,7 +602,7 @@
     refreshScores(); window.scrollTo(0,0);
   });
 
-  /* ===== Export DOM untuk WA (hindari halaman kosong) ===== */
+  /* ===== Export DOM (untuk bikin PDF stabil tanpa halaman kosong) ===== */
   function collectPhotos(){
     const out=[]; qsa('#photos .photo-card').forEach(c=>{
       const img=qs('.photo-stage img',c); const d=qs('.photo-desc',c);
@@ -619,12 +612,14 @@
   function buildExportDOM(){
     const src=qs('#appRoot'); const clone=src.cloneNode(true); clone.id='exportRoot';
     const tb=clone.querySelector('.toolbar'); if(tb) tb.remove();
-    // remarks -> div
+
+    // remarks -> div (agar seluruh teks tercetak)
     clone.querySelectorAll('textarea.remarks').forEach(ta=>{
       const div=document.createElement('div'); div.style.cssText='border:1px solid #d1d5db;border-radius:6px;padding:6px 8px;font-size:12px;white-space:pre-wrap;min-height:18px;background:#fff';
       div.textContent=ta.value||''; const wrap=ta.parentNode; wrap.replaceChild(div,ta); const counter=wrap.querySelector('.counter'); if(counter) counter.remove();
     });
-    // rebuild photos 2x2 1 halaman
+
+    // rebuild Photos 2x2 untuk 1 halaman
     const ph=collectPhotos(); const newPhotos=document.createElement('div'); newPhotos.className='photos';
     for (let s=0;s<4;s++){
       const card=document.createElement('div'); card.className='photo-card'; card.style.cssText='background:#fff;color:#111;border:1px solid #ddd;border-radius:6px;padding:12px';
@@ -636,6 +631,7 @@
     }
     const oldPhotos=clone.querySelector('.photos'); if(oldPhotos){ const br=document.createElement('div'); br.className='html2pdf__page-break'; oldPhotos.parentNode.insertBefore(br, oldPhotos); oldPhotos.replaceWith(newPhotos); }
 
+    // gaya khusus ekspor (offscreen)
     const style=document.createElement('style');
     style.textContent='#exportMount{position:fixed;left:-10000px;top:0;width:794px;z-index:-1}#exportRoot{width:794px;background:#fff;color:#111}#exportRoot *{page-break-before:auto !important;page-break-inside:auto !important}#exportRoot .photos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:0}';
     const mount=document.createElement('div'); mount.id='exportMount'; mount.appendChild(style); mount.appendChild(clone); document.body.appendChild(mount);
@@ -645,7 +641,7 @@
     const project=(qs('#inp-project').value||'PROJECT').replace(/\s+/g,'_'); const date=(qs('#inp-date').value||(new Date().toISOString().slice(0,10)));
     return `MHC_${project}_${date}.pdf`;
   }
-  function buildPdfBlob(){
+  function buildPdfBlobForShare(){
     return new Promise((resolve,reject)=>{
       if (typeof html2pdf==='undefined') return reject(new Error('html2pdf not loaded'));
       const mount=buildExportDOM(); const root=mount.querySelector('#exportRoot');
@@ -658,50 +654,42 @@
     });
   }
 
-  /* ===== WhatsApp Share ===== */
-  function shareViaWhatsApp(){
-    const btn=qs('#waBtn'); const old=btn.textContent; btn.disabled=true; btn.textContent=(getLang()==='en'?'Preparing PDF…':'Menyiapkan PDF…');
+  /* ===== Send by WhatsApp — Simple Mode (download + buka WA) ===== */
+  async function shareViaWhatsAppSimple(){
+    const btn = document.getElementById('waBtn');
+    const old = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = (getLang()==='en'?'Preparing PDF…':'Menyiapkan PDF…');
 
-    // Cek konteks
-    const secureOK = window.isSecureContext;
-    const canFileShare = ('canShare' in navigator) && (function(){ try{ return navigator.canShare({ files:[ new File(['x'],'x.txt',{type:'text/plain'}) ] }); }catch(e){ return false; }})();
-    const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    try{
+      const blob = await buildPdfBlobForShare();
+      const fname = filenameFromMeta().replace(/\.pdf$/i,'') + '.pdf';
 
-    if (!secureOK || !canFileShare){
-      showInstallBanner(true);
+      // Unduh dulu
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = fname; document.body.appendChild(a); a.click();
+      setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 60000);
+
+      // Buka WhatsApp (ke nomor bila diisi)
+      const toRaw = (document.getElementById('inp-wa')?.value || '').trim();
+      const to = toRaw.replace(/[^\d+]/g,'');
+      const msgID = `PDF sudah diunduh dengan nama: ${fname}. Silakan lampirkan file tersebut dari folder Download.`;
+      const msgEN = `The PDF has been downloaded as: ${fname}. Please attach the file from your Downloads folder.`;
+      const lang = getLang();
+      const msg = encodeURIComponent(lang==='en' ? msgEN : msgID);
+      const waURL = to ? `https://wa.me/${encodeURIComponent(to)}?text=${msg}` : `https://wa.me/?text=${msg}`;
+      window.location.href = waURL;
+    }catch(e){
+      console.error(e);
+      alert(getLang()==='en' ? 'Failed to prepare the PDF.' : 'Gagal menyiapkan PDF.');
+    }finally{
+      btn.textContent = old;
+      btn.disabled = false;
     }
-
-    buildPdfBlob().then(blob=>{
-      let file; try{ file=new File([blob], filenameFromMeta(), {type:'application/pdf', lastModified:Date.now()}); }catch(e){ file=blob; file.name=filenameFromMeta(); file.type='application/pdf'; }
-
-      if (secureOK && canFileShare){ // ini jalur auto attach
-        btn.textContent=(getLang()==='en'?'Opening Share…':'Membuka Share…');
-        return navigator.share({
-          files:[file],
-          title:'Material Handling Checklist',
-          text:(getLang()==='en' ? 'Material Handling Checklist (PDF attached).' : 'Material Handling Checklist (PDF terlampir).')
-        });
-      } else {
-        // Fallback: download + buka WA dengan pesan
-        const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filenameFromMeta(); a.click(); setTimeout(()=>URL.revokeObjectURL(url),60000);
-        const msgID='PDF telah diunduh. Buka WhatsApp lalu lampirkan file dari penyimpanan.';
-        const msgEN='PDF downloaded. Open WhatsApp and attach the file from storage.';
-        const message=encodeURIComponent(getLang()==='en'?msgEN:msgID);
-        const waUrl=(/Android/i.test(navigator.userAgent)?'https://wa.me/?text=':'https://web.whatsapp.com/send?text=')+message;
-        window.open(waUrl,'_blank');
-        alert(getLang()==='en'
-          ? 'Untuk auto-attach file, buka laman ini melalui HTTPS dan instal sebagai App (Add to Home Screen).'
-          : 'Agar bisa auto-attach file, buka laman ini via HTTPS dan instal sebagai Aplikasi (Add to Home Screen).');
-      }
-    }).catch(err=>{
-      console.error(err);
-      alert(getLang()==='en' ? 'Failed to generate or share PDF.' : 'Gagal membuat atau membagikan PDF.');
-    }).then(()=>{ btn.textContent=old; btn.disabled=false; });
   }
-  qs('#waBtn').addEventListener('click', shareViaWhatsApp);
+  document.getElementById('waBtn').onclick = shareViaWhatsAppSimple;
 
-  // tampilkan banner jika perlu pada load
-  showInstallBanner(true);
 })();
 </script>
 </body>
