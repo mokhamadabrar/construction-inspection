@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Material Handling Checklist — Final v4</title>
+<title>Material Handling Checklist — Final v5</title>
 <style>
   :root{
     --brand:#6a1b9a; --row:#f7f9fc; --header:#0ea5e9; --border:#d1d5db;
@@ -19,10 +19,30 @@
   .logo-wrap img{width:min(40vw,260px);height:auto;max-height:120px}
   .logo-caption{font-size:12px;color:#374151;text-align:center;margin-top:4px}
 
-  /* Language bar */
-  .langbar{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin:-4px 0 8px}
-  .langbar label{font-size:12px;color:#374151}
-  .langbar select{border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:12px;background:#fff}
+  /* Language buttons */
+  .langbar{
+    display:flex;justify-content:flex-end;gap:10px;align-items:center;
+    margin:-4px 0 8px; flex-wrap:wrap;
+  }
+  .langbar .hint{font-size:12px;color:#374151;margin-right:4px}
+  .lang-btn{
+    display:inline-flex;align-items:center;gap:8px;
+    border:1px solid var(--border);border-radius:999px;background:#fff;
+    padding:8px 12px; cursor:pointer; user-select:none;
+    box-shadow:0 1px 2px rgba(0,0,0,.04);
+    min-height:44px; /* nyaman untuk sentuhan */
+  }
+  .lang-btn[aria-pressed="true"]{
+    outline:2px solid #0ea5e9; outline-offset:2px;
+    box-shadow:0 0 0 2px rgba(14,165,233,.15) inset;
+  }
+  .lang-btn img{width:24px;height:auto;display:block}
+  .lang-btn .lbl{font-size:13px;color:#111}
+  @media (max-width:480px){
+    .lang-btn{padding:8px 10px}
+    .lang-btn .lbl{display:none}  /* hemat ruang di Android */
+    .lang-btn img{width:28px}
+  }
 
   .meta{display:grid;gap:8px 16px;grid-template-columns:repeat(6,1fr);font-size:13px;margin-bottom:8px}
   .meta .label{color:var(--muted)}
@@ -100,18 +120,13 @@
     .photo-card{
       background:#fff; color:#111;
       border:1px solid #ddd; padding:5mm; border-radius:6px;
-      min-height:120mm;                 /* approx 2 rows per A4 */
+      min-height:120mm; /* ~2 rows per A4 */
       break-inside: avoid;
       page-break-inside: avoid;
     }
-    .photo-stage{
-      border:1px solid #ccc; background:#fff; border-radius:4px;
-    }
-    .photo-actions{display:none}        /* hide inputs on print */
-    .photo-desc-print{
-      display:block;                    /* show clean caption */
-      font-size:11px; color:#111; background:transparent; padding:0; margin-top:3mm
-    }
+    .photo-stage{ border:1px solid #ccc; background:#fff; border-radius:4px; }
+    .photo-actions{display:none}
+    .photo-desc-print{ display:block; font-size:11px; color:#111; background:transparent; padding:0; margin-top:3mm }
   }
 </style>
 </head>
@@ -127,13 +142,17 @@
     </div>
   </div>
 
-  <!-- Language Switcher (tanpa mengubah teks asli) -->
-  <div class="langbar">
-    <label for="langSelect">Bahasa:</label>
-    <select id="langSelect" aria-label="Language">
-      <option value="id" selected>Indonesia</option>
-      <option value="en">English</option>
-    </select>
+  <!-- Language Buttons (Auto Translate) -->
+  <div class="langbar" role="group" aria-label="Auto translate">
+    <span class="hint">Auto translate:</span>
+    <button id="btnID" type="button" class="lang-btn" aria-pressed="false" aria-label="Indonesia">
+      <img src="https://mokhamadabrar.github.io/construction-inspection/ID.png" alt="ID"/>
+      <span class="lbl">Indonesia</span>
+    </button>
+    <button id="btnEN" type="button" class="lang-btn" aria-pressed="false" aria-label="English">
+      <img src="https://mokhamadabrar.github.io/construction-inspection/EN.png" alt="EN"/>
+      <span class="lbl">English</span>
+    </button>
   </div>
 
   <div class="meta">
@@ -485,7 +504,6 @@
   function enforceMaxWithAlert(el, MAX, fieldName, lang){
     if(el.value.length > MAX){
       el.value = el.value.slice(0, MAX);
-      // Alarm pop-up
       const msg = lang==='en'
         ? `Maximum ${MAX} characters for ${fieldName}. Text has been truncated to meet the requirement.`
         : `Maksimal ${MAX} karakter untuk ${fieldName}. Teks telah dipotong agar sesuai ketentuan.`;
@@ -531,46 +549,38 @@
       rd.readAsDataURL(file);
     });
   });
-
   document.querySelectorAll('.photo-card .photo-desc').forEach(desc=>{
     const printBox = desc.closest('.photo-card').querySelector('.photo-desc-print');
     const sync = ()=>{
       enforceMaxWithAlert(desc, MAX_DESC, currentLang==='en'?'Photo Description':'Deskripsi Foto', currentLang);
       printBox.textContent = desc.value ? desc.value : '';
     };
-    // init
     desc.setAttribute('maxlength', String(MAX_DESC));
     sync();
-    // listeners
     desc.addEventListener('input', sync);
     desc.addEventListener('paste', ()=>setTimeout(sync,0));
   });
 
   // ---- i18n (runtime) ----
   let currentLang = localStorage.getItem('mhc_lang') || 'id';
-  const langSelect = document.getElementById('langSelect');
-  langSelect.value = currentLang;
 
-  // Kumpulkan peta pertanyaan: key = isi sel No. (A1..D15) -> elemen .ques
+  // Peta pertanyaan: key = "A1..D15" -> elemen .ques
   function getQuestionMap(){
     const map = {};
     document.querySelectorAll('.chk-table tbody tr').forEach(tr=>{
       const no = tr.querySelector('.col-no');
       const q = tr.querySelector('.ques');
-      if(no && q){
-        const key = no.textContent.trim();
-        map[key] = q;
-      }
+      if(no && q){ map[no.textContent.trim()] = q; }
     });
     return map;
   }
   const qMap = getQuestionMap();
 
-  // Simpan baseline teks ID langsung dari DOM (tidak mengubah naskah Anda)
+  // Baseline ID diambil dari DOM apa adanya (tidak mengubah naskah Anda)
   const baselineID = {};
   Object.keys(qMap).forEach(k => baselineID[k] = qMap[k].textContent.trim());
 
-  // Kamus EN (silakan koreksi jika perlu)
+  // Kamus label & pertanyaan EN
   const i18n = {
     id: {
       labels: {
@@ -587,9 +597,12 @@
         ph_project: "Kode/Nama",
         ph_location: "Lokasi",
         ph_remarks: "Remarks (maks 70 karakter)…",
-        ph_photo: "Deskripsi foto (maks 58)…"
+        ph_photo: "Deskripsi foto (maks 58)…",
+        radio_yes: "Ya",
+        radio_no: "Tidak",
+        radio_na: "N/A"
       },
-      questions: baselineID // pakai baseline DOM
+      questions: baselineID
     },
     en: {
       labels: {
@@ -606,7 +619,10 @@
         ph_project: "Code/Name",
         ph_location: "Location",
         ph_remarks: "Remarks (max 70 characters)…",
-        ph_photo: "Photo description (max 58)…"
+        ph_photo: "Photo description (max 58)…",
+        radio_yes: "Yes",
+        radio_no: "No",
+        radio_na: "N/A"
       },
       questions: {
         A1: "Is the placement of materials compliant with the MSRA location and storage requirements?",
@@ -629,20 +645,12 @@
   };
 
   function setPlaceholders(lang){
-    // meta inputs
     document.getElementById('inp-assessor').placeholder = i18n[lang].labels.ph_assessor;
     document.getElementById('inp-project').placeholder  = i18n[lang].labels.ph_project;
     document.getElementById('inp-location').placeholder = i18n[lang].labels.ph_location;
-    // remarks placeholders
-    document.querySelectorAll('textarea.remarks').forEach(t=>{
-      t.placeholder = i18n[lang].labels.ph_remarks;
-    });
-    // photo desc placeholders
-    document.querySelectorAll('.photo-desc').forEach(p=>{
-      p.placeholder = i18n[lang].labels.ph_photo;
-    });
+    document.querySelectorAll('textarea.remarks').forEach(t=> t.placeholder = i18n[lang].labels.ph_remarks);
+    document.querySelectorAll('.photo-desc').forEach(p=> p.placeholder = i18n[lang].labels.ph_photo);
   }
-
   function setLabels(lang){
     document.querySelectorAll('[data-i18n]').forEach(el=>{
       const key = el.getAttribute('data-i18n');
@@ -650,7 +658,22 @@
       if(txt) el.textContent = txt;
     });
   }
-
+  function setRadioLabels(lang){
+    const yesTxt = i18n[lang].labels.radio_yes;
+    const noTxt  = i18n[lang].labels.radio_no;
+    const naTxt  = i18n[lang].labels.radio_na;
+    document.querySelectorAll('.yn label').forEach(lab=>{
+      const inp = lab.querySelector('input');
+      if(!inp) return;
+      let txt = naTxt;
+      if(inp.value==='yes') txt = yesTxt;
+      else if(inp.value==='no') txt = noTxt;
+      // ubah text node tanpa merusak input/listener
+      let textNode = Array.from(lab.childNodes).find(n=> n.nodeType===Node.TEXT_NODE);
+      if(textNode){ textNode.nodeValue = ' ' + txt; }
+      else{ lab.appendChild(document.createTextNode(' ' + txt)); }
+    });
+  }
   function setQuestions(lang){
     const dict = i18n[lang].questions;
     Object.keys(qMap).forEach(key=>{
@@ -665,16 +688,19 @@
     setLabels(lang);
     setPlaceholders(lang);
     setQuestions(lang);
+    setRadioLabels(lang);
     localStorage.setItem('mhc_lang', lang);
+    // update tombol state
+    document.getElementById('btnID').setAttribute('aria-pressed', lang==='id' ? 'true' : 'false');
+    document.getElementById('btnEN').setAttribute('aria-pressed', lang==='en' ? 'true' : 'false');
   }
 
-  // Inisialisasi bahasa saat load
+  // Init language on load
   applyLanguage(currentLang);
 
-  // Event ganti bahasa
-  langSelect.addEventListener('change', (e)=>{
-    applyLanguage(e.target.value);
-  });
+  // Tombol translate
+  document.getElementById('btnID').addEventListener('click', ()=>applyLanguage('id'));
+  document.getElementById('btnEN').addEventListener('click', ()=>applyLanguage('en'));
 
   // ---- print & reset ----
   document.getElementById('printBtn').addEventListener('click', ()=>window.print());
