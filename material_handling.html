@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Material Handling Checklist — Final v7</title>
+<title>Material Handling Checklist — Final v8 (WA Share)</title>
 <style>
   :root{
     --brand:#6a1b9a; --row:#f7f9fc; --header:#0ea5e9; --border:#d1d5db;
@@ -92,6 +92,14 @@
   .footer .line{height:1px;background:var(--border);margin:10px 0}
   .footer b{color:#111827}
 
+  /* toolbar buttons */
+  .toolbar{display:flex;gap:10px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}
+  .btn{border:none;border-radius:10px;padding:10px 14px;font-weight:700;color:#fff}
+  .btn.print{background:#111827}
+  .btn.reset{background:#0ea5e9}
+  .btn.wa{background:#25D366}
+  .btn[disabled]{opacity:.7;cursor:progress}
+
   /* responsive */
   @media (max-width:800px){ .meta{grid-template-columns:repeat(2,1fr)} }
   @media (max-width:640px){ .photos{grid-template-columns:1fr} .col-no{width:64px} }
@@ -116,7 +124,7 @@
     /* Photos page dedicated */
     .photos{
       page-break-before: always;
-      page-break-after: always;  /* akhir dokumen: umumnya tidak menambah halaman kosong */
+      page-break-after: always;
       grid-template-columns: 1fr 1fr;
       gap: 6mm;
       margin-top: 0;
@@ -143,7 +151,9 @@
   <!-- LOGO -->
   <div class="logo-wrap" aria-label="Logo PT Jaya Obayashi">
     <div>
-      <img src="https://mokhamadabrar.github.io/construction-inspection/Logo-JO.png" alt="PT Jaya Obayashi" />
+      <img crossOrigin="anonymous" referrerpolicy="no-referrer"
+           src="https://mokhamadabrar.github.io/construction-inspection/Logo-JO.png"
+           alt="PT Jaya Obayashi" />
       <div class="logo-caption">PT Jaya Obayashi</div>
     </div>
   </div>
@@ -161,7 +171,7 @@
     </button>
   </div>
 
-  <!-- Meta (tambah Kontraktor) -->
+  <!-- Meta (termasuk Kontraktor) -->
   <div class="meta">
     <div class="label" data-i18n="label_site">Site Assesssor</div><input id="inp-assessor" placeholder="Nama Site Assesssor"/>
     <div class="label" data-i18n="label_project">Project</div><input id="inp-project" value="JKT09" placeholder="Kode/Nama"/>
@@ -421,7 +431,7 @@
     <div class="score-card"><h4>Total Score <span id="badge" class="badge">0/100</span></h4><div class="score-val" id="totalScore">0%</div></div>
   </div>
 
-  <!-- Footer (diletakkan sebelum halaman Foto saat print) -->
+  <!-- Footer -->
   <div class="footer" role="contentinfo">
     <div class="line"></div>
     <div>Created &amp; Review by</div>
@@ -429,7 +439,7 @@
     <div>Application Design by <b>Abrar (T&amp;T)</b> @ 2025</div>
   </div>
 
-  <!-- Photos (akan menjadi halaman tersendiri saat print) -->
+  <!-- Photos (halaman khusus saat cetak) -->
   <div class="photos" id="photos">
     <div class="photo-card" data-slot="1">
       <div class="photo-stage"><span>Tambahkan Foto</span></div>
@@ -465,11 +475,16 @@
     </div>
   </div>
 
-  <div class="toolbar" style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap">
-    <button class="btn" id="printBtn" style="border:none;border-radius:10px;padding:10px 14px;font-weight:700;background:#111827;color:#fff">Print PDF (A4)</button>
-    <button class="btn" id="resetBtn" style="border:none;border-radius:10px;padding:10px 14px;font-weight:700;background:#0ea5e9;color:#fff">Reset</button>
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <button class="btn wa" id="waBtn">Send by WhatsApp</button>
+    <button class="btn print" id="printBtn">Print PDF (A4)</button>
+    <button class="btn reset" id="resetBtn">Reset</button>
   </div>
 </div>
+
+<!-- html2pdf (bundled: html2canvas + jsPDF) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-YcsIP4n2uR2bM8r8ZlLkqGdZz4Vt3H1Z2b1bG6b0y7n5t7o8m9u3qfba7j0YwP2S7eCYbYcTgYJ/Z5x6z6x3wQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <script>
   /* ==== LANGUAGE STATE ==== */
@@ -583,7 +598,6 @@
   });
 
   /* ==== i18n ==== */
-  // mapping pertanyaan
   function getQuestionMap(){
     const map = {};
     document.querySelectorAll('.chk-table tbody tr').forEach(tr=>{
@@ -594,12 +608,7 @@
     return map;
   }
   const qMap = getQuestionMap();
-
-  // baseline ID dari DOM (teks pertanyaan tidak diubah)
-  const baselineID = {};
-  Object.keys(qMap).forEach(k => baselineID[k] = qMap[k].textContent.trim());
-
-  // kamus
+  const baselineID = {}; Object.keys(qMap).forEach(k => baselineID[k] = qMap[k].textContent.trim());
   const i18n = {
     id: {
       labels: {
@@ -608,20 +617,10 @@
         label_date: "Date",
         label_location: "Location",
         label_contractor: "Kontraktor",
-        th_no: "No.",
-        th_question: "Pertanyaan",
-        th_yes: "YES",
-        th_no2: "NO",
-        th_na: "N/A",
-        ph_assessor: "Nama Site Assesssor",
-        ph_project: "Kode/Nama",
-        ph_location: "Lokasi",
-        ph_contractor: "Nama Kontraktor",
-        ph_remarks: "Remarks (maks 70 karakter)…",
-        ph_photo: "Deskripsi foto (maks 58)…",
-        radio_yes: "Ya",
-        radio_no: "Tidak",
-        radio_na: "N/A"
+        th_no: "No.", th_question: "Pertanyaan", th_yes: "YES", th_no2: "NO", th_na: "N/A",
+        ph_assessor: "Nama Site Assesssor", ph_project: "Kode/Nama", ph_location: "Lokasi", ph_contractor: "Nama Kontraktor",
+        ph_remarks: "Remarks (maks 70 karakter)…", ph_photo: "Deskripsi foto (maks 58)…",
+        radio_yes: "Ya", radio_no: "Tidak", radio_na: "N/A"
       },
       questions: baselineID
     },
@@ -632,31 +631,21 @@
         label_date: "Date",
         label_location: "Location",
         label_contractor: "Contractor",
-        th_no: "No.",
-        th_question: "Question",
-        th_yes: "YES",
-        th_no2: "NO",
-        th_na: "N/A",
-        ph_assessor: "Site assessor name",
-        ph_project: "Code/Name",
-        ph_location: "Location",
-        ph_contractor: "Contractor name",
-        ph_remarks: "Remarks (max 70 characters)…",
-        ph_photo: "Photo description (max 58)…",
-        radio_yes: "Yes",
-        radio_no: "No",
-        radio_na: "N/A"
+        th_no: "No.", th_question: "Question", th_yes: "YES", th_no2: "NO", th_na: "N/A",
+        ph_assessor: "Site assessor name", ph_project: "Code/Name", ph_location: "Location", ph_contractor: "Contractor name",
+        ph_remarks: "Remarks (max 70 characters)…", ph_photo: "Photo description (max 58)…",
+        radio_yes: "Yes", radio_no: "No", radio_na: "N/A"
       },
       questions: {
-        A1: "Is the placement of materials compliant with the MSRA location and storage requirements?",
-        A2: "Have the material weight/dimensions and movement method been discussed? (check the MSRA; plan vehicle route and consider load weight)",
-        A3: "Does the material placement not obstruct pedestrians, provide access for picking, and are barricades provided?",
-        A4: "Do you know the manual lifting limit is 18.14 kg per person, and loads longer than 3 m must be lifted by more than one person?",
-        B5: "Whom do you report to if you need equipment to move your materials?",
-        B6: "Have you checked that the handling/lifting equipment has been pre-use checklisted?",
-        B7: "Do the handling/lifting equipment operators hold a valid license (SIO)?",
-        C8: "Is the lifting equipment certification (SILO) available and valid?",
-        C9: "Has the handling (lifting) equipment been inspected before being mobilized/used?",
+        A1:"Is the placement of materials compliant with the MSRA location and storage requirements?",
+        A2:"Have the material weight/dimensions and movement method been discussed? (check the MSRA; plan vehicle route and consider load weight)",
+        A3:"Does the material placement not obstruct pedestrians, provide access for picking, and are barricades provided?",
+        A4:"Do you know the manual lifting limit is 18.14 kg per person, and loads longer than 3 m must be lifted by more than one person?",
+        B5:"Whom do you report to if you need equipment to move your materials?",
+        B6:"Have you checked that the handling/lifting equipment has been pre-use checklisted?",
+        B7:"Do the handling/lifting equipment operators hold a valid license (SIO)?",
+        C8:"Is the lifting equipment certification (SILO) available and valid?",
+        C9:"Has the handling (lifting) equipment been inspected before being mobilized/used?",
         C10:"Have other auxiliary tools been inspected and declared fit for use?",
         C11:"Is the PPE in accordance with MSDS requirements?",
         D12:"Do you have waste bins for leftover materials to be disposed of?",
@@ -706,19 +695,13 @@
   }
   function applyLanguage(lang){
     currentLang = (lang==='en') ? 'en' : 'id';
-    setLabels(currentLang);
-    setPlaceholders(currentLang);
-    setQuestions(currentLang);
-    setRadioLabels(currentLang);
+    setLabels(currentLang); setPlaceholders(currentLang); setQuestions(currentLang); setRadioLabels(currentLang);
     localStorage.setItem('mhc_lang', currentLang);
     document.getElementById('btnID').setAttribute('aria-pressed', currentLang==='id' ? 'true' : 'false');
     document.getElementById('btnEN').setAttribute('aria-pressed', currentLang==='en' ? 'true' : 'false');
   }
-
-  // INIT: default Indonesia
   applyLanguage(getLang());
 
-  // Buttons
   document.getElementById('btnID').addEventListener('click', ()=>applyLanguage('id'));
   document.getElementById('btnEN').addEventListener('click', ()=>applyLanguage('en'));
 
@@ -735,6 +718,108 @@
     });
     refreshScores(); window.scrollTo({top:0,behavior:'smooth'});
   });
+
+  /* ==== WHATSAPP SHARE (PDF) ==== */
+  function filenameFromMeta(){
+    const project = (document.getElementById('inp-project').value || 'PROJECT').trim().replace(/\s+/g,'_');
+    const date = (document.getElementById('inp-date').value || new Date().toISOString().slice(0,10));
+    return `MHC_${project}_${date}.pdf`;
+  }
+
+  function expandRemarksForExport(){
+    const areas = Array.from(document.querySelectorAll('textarea.remarks'));
+    const original = [];
+    areas.forEach(a=>{
+      original.push([a, a.style.height, a.style.overflow]);
+      a.style.height = 'auto';
+      a.style.overflow = 'visible';
+      a.style.height = a.scrollHeight + 'px';
+    });
+    return ()=>{ original.forEach(([a,h,o])=>{ a.style.height = h || ''; a.style.overflow = o || ''; }); };
+  }
+
+  async function buildPdfBlobSafe(){
+    const el = document.querySelector('.page');
+    const filename = filenameFromMeta();
+    const opt = {
+      margin: 10,
+      filename,
+      image: { type:'jpeg', quality:0.95 },
+      html2canvas: { scale:2, useCORS:true, allowTaint:true, background:'#ffffff' },
+      jsPDF: { unit:'mm', format:'a4', orientation:'portrait' },
+      pagebreak: { mode: ['css','legacy'] }
+    };
+
+    // Cegah toolbar ikut tertangkap
+    document.querySelector('.toolbar').style.visibility = 'hidden';
+
+    // Jika logo eksternal menghalangi (CORS), kita sembunyikan saat gagal
+    const logo = document.querySelector('.logo-wrap img');
+    const restoreRemarks = expandRemarksForExport();
+
+    try{
+      const blob = await html2pdf().set(opt).from(el).outputPdf('blob');
+      return blob;
+    }catch(err1){
+      // coba lagi tanpa logo
+      if(logo) logo.style.visibility = 'hidden';
+      try{
+        const blob = await html2pdf().set(opt).from(el).outputPdf('blob');
+        return blob;
+      }catch(err2){
+        console.error('Gagal membuat PDF:', err2);
+        throw err2;
+      }finally{
+        if(logo) logo.style.visibility = '';
+      }
+    }finally{
+      restoreRemarks();
+      document.querySelector('.toolbar').style.visibility = '';
+    }
+  }
+
+  async function shareViaWhatsApp(){
+    const btn = document.getElementById('waBtn');
+    const oldTxt = btn.textContent;
+    btn.textContent = (getLang()==='en'?'Sending...':'Mengirim...');
+    btn.disabled = true;
+
+    try{
+      const blob = await buildPdfBlobSafe();
+      const file = new File([blob], filenameFromMeta(), { type:'application/pdf' });
+
+      if(navigator.canShare && navigator.canShare({ files:[file] })){
+        await navigator.share({
+          files: [file],
+          title: 'Material Handling Checklist',
+          text: 'Material Handling Checklist (PDF terlampir).'
+        });
+      }else{
+        // Fallback: unduh lalu buka WhatsApp dengan pesan
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = filenameFromMeta(); a.click();
+        setTimeout(()=>URL.revokeObjectURL(url), 60000);
+
+        const msgID = 'PDF telah diunduh. Silakan kirim ke WhatsApp sebagai lampiran.';
+        const msgEN = 'PDF downloaded. Please attach it in WhatsApp.';
+        const message = encodeURIComponent(getLang()==='en'? msgEN : msgID);
+        window.open(`https://wa.me/?text=${message}`, '_blank');
+        alert(getLang()==='en'
+          ? 'Your browser does not support sharing files directly to WhatsApp. The PDF has been downloaded—attach it from your gallery/files in WhatsApp.'
+          : 'Browser Anda tidak mendukung berbagi file langsung ke WhatsApp. PDF sudah diunduh—lampirkan dari galeri/berkas di WhatsApp.');
+      }
+    }catch(e){
+      alert(getLang()==='en'
+        ? 'Failed to generate PDF. Please try again or use Print to save as PDF.'
+        : 'Gagal membuat PDF. Silakan coba lagi atau gunakan Print untuk simpan sebagai PDF.');
+    }finally{
+      btn.textContent = oldTxt;
+      btn.disabled = false;
+    }
+  }
+
+  document.getElementById('waBtn').addEventListener('click', shareViaWhatsApp);
 </script>
 </body>
 </html>
