@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Material Handling Checklist</title>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <!-- jsPDF + html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body{font-family:sans-serif;margin:0;padding:20px;max-width:900px;margin:auto}
+    h1{color:#1d4ed8} button{padding:10px;margin:6px;background:#0ea5e9;color:#fff;border:none;border-radius:6px;cursor:pointer}
+    table{width:100%;border-collapse:collapse;margin-top:20px} td,th{border:1px solid #ccc;padding:8px}
+    input,textarea{width:100%;padding:6px;margin-top:4px}
+    .hidden{display:none}
+    #statusBox{margin-top:10px;padding:8px;border-radius:6px;display:none;font-size:14px}
+    #statusBox.loading{background:#fef3c7;color:#92400e;display:block}
+    #statusBox.success{background:#d1fae5;color:#065f46;display:block}
+  </style>
+</head>
+<body>
+  <h1>Material Handling Checklist</h1>
+
+  <div>
+    <button id="loginBtn">Login with Google</button>
+    <button id="logoutBtn" class="hidden">Logout</button>
+    <div id="userInfo"></div>
+  </div>
+
+  <div>
+    <label>Nama Perusahaan: <input id="inp-contractor" /></label>
+  </div>
+
+  <div id="checklist-form">
+    <table>
+      <thead><tr><th>No</th><th>Pertanyaan</th><th>YES</th><th>NO</th><th>N/A</th><th>Remarks</th></tr></thead>
+      <tbody id="formBody"></tbody>
+    </table>
+    <button id="submitBtn">Submit Checklist</button>
+    <div id="statusBox"></div>
+  </div>
+
+  <h3>Histori Anda</h3>
+  <table>
+    <thead><tr><th>Tanggal</th><th>Perusahaan</th><th>Score</th></tr></thead>
+    <tbody id="historyBody"></tbody>
+  </table>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA7rFXUNifIMoNTURY7Nv9Le7GAE_fPzQg",
+      authDomain: "mhc-checklist.firebaseapp.com",
+      projectId: "mhc-checklist",
+      appId: "1:444713044680:web:8eab2b9a470b0e388c73fd"
+    };
+
+    const WEB_APP_URL = "https://accounts.google.com/o/oauth2/auth";
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    function setStatus(message, type) {
+      const box = document.getElementById('statusBox');
+      box.className = ''; box.classList.add(type); box.textContent = message;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const loginBtn = document.getElementById('loginBtn');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const userInfo = document.getElementById('userInfo');
+
+      loginBtn.onclick = () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+      logoutBtn.onclick = () => auth.signOut();
+
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          loginBtn.classList.add('hidden');
+          logoutBtn.classList.remove('hidden');
+          userInfo.textContent = `${user.displayName} (${user.email})`;
+          loadHistory(user.email);
+        } else {
+          loginBtn.classList.remove('hidden');
+          logoutBtn.classList.add('hidden');
+          userInfo.textContent = '';
+          document.getElementById('historyBody').innerHTML = '';
+        }
+      });
+
+      const questions = ['A1','A2','A3','A4','B5','B6','B7','C8','C9','C10','C11','D12','D13','D14','D15'];
+      const labels = {
+        A1:"Apakah penempatan material sesuai MSRA?", A2:"Apakah berat/dimensi telah didiskusikan?",
+        A3:"Apakah penempatan material tidak menghalangi?", A4:"Apakah tahu batas angkat manual?",
+        B5:"Kepada siapa anda melapor?", B6:"Apakah alat sudah dicek?", B7:"Operator punya lisensi?",
+        C8:"Sertifikasi alat tersedia?", C9:"Alat diperiksa sebelum pakai?", C10:"Alat bantu layak?", C11:"PPE sesuai MSDS?",
+        D12:"Punya tempat sampah?", D13:"Tahu lokasi koleksi?", D14:"Bersih sebelum & sesudah?", D15:"Floor protection tersedia?"
+      };
+      const formBody = document.getElementById('formBody');
+      questions.forEach(q => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${q}</td><td>${labels[q]}</td>
+          <td><input type="radio" name="${q}" value="yes"></td>
+          <td><input type="radio" name="${q}" value="no"></td>
+          <td><input type="radio" name="${q}" value="na"></td>
+          <td><textarea name="${q}" class="remarks"></textarea></td>
+        `;
+        formBody.appendChild(row);
+      });
+
+      document.getElementById('submitBtn').addEventListener('click', submitChecklistToSheet);
+    });
+
+    async function submitChecklistToSheet() {
+      try {
+        setStatus("Mengirim data...", "loading");
+
+        const user = auth.currentUser;
+        if (!user) return alert("Harap login dahulu.");
+        const company = document.getElementById('inp-contractor').value.trim();
+        if (!company) return alert("Isi nama perusahaan.");
+
+        const questions = ['A1','A2','A3','A4','B5','B6','B7','C8','C9','C10','C11','D12','D13','D14','D15'];
+        const answers = {}, remarks = {}, score = { A: 0, B: 0, C: 0, D: 0 }, sections = { A: 4, B: 3, C: 4, D: 4 };
+        let totalYes = 0, totalQs = 0;
+        questions.forEach(q => {
+          const ans = document.querySelector(`input[name="${q}"]:checked`);
+          const val = ans ? ans.value : '';
+          answers[q] = val;
+          if (val === 'yes') {
+            totalYes++; const sec = q.charAt(0); score[sec]++;
+          }
+          if (val !== 'na') totalQs++;
+          const rem = document.querySelector(`textarea[name="${q}"]`).value.trim();
+          remarks[q] = rem;
+        });
+
+        score.A = Math.round(100 * score.A / sections.A);
+        score.B = Math.round(100 * score.B / sections.B);
+        score.C = Math.round(100 * score.C / sections.C);
+        score.D = Math.round(100 * score.D / sections.D);
+        score.total = Math.round(100 * totalYes / totalQs);
+
+        const payload = {
+          name: user.displayName, email: user.email, company, score, answers, remarks
+        };
+
+        await fetch(`${WEB_APP_URL}?path=submit`, {
+          method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'application/json' }
+        });
+        await exportChecklistAsPDF(user.displayName, company);
+        await sendChecklistPDFtoEmail(user.email, user.displayName, company);
+        setStatus("✅ Checklist berhasil dikirim & disimpan", "success");
+      } catch (err) {
+        alert("❌ Terjadi kesalahan saat mengirim data.");
+        console.error(err);
+      }
+    }
+
+    async function exportChecklistAsPDF(userName, companyName) {
+      const el = document.body;
+      const { jsPDF } = window.jspdf;
+      const canvas = await html2canvas(el, { scale: 2 });
+      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const width = 210, height = canvas.height * width / canvas.width;
+      pdf.addImage(imgData, 'JPEG', 0, 0, width, height);
+      pdf.save(`Checklist-${companyName}-${userName}.pdf`);
+    }
+
+    async function sendChecklistPDFtoEmail(to, name, company) {
+      const el = document.body;
+      const { jsPDF } = window.jspdf;
+      const canvas = await html2canvas(el, { scale: 2 });
+      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const width = 210, height = canvas.height * width / canvas.width;
+      pdf.addImage(imgData, 'JPEG', 0, 0, width, height);
+      const base64 = pdf.output('datauristring').split(',')[1];
+      const payload = {
+        to: to,
+        subject: `Checklist - ${company}`,
+        body: `Dear ${name},<br>Berikut hasil checklist Anda.<br>Terima kasih.`,
+        filename: `Checklist-${company}-${name}.pdf`,
+        pdfBase64: base64
+      };
+      await fetch(`${WEB_APP_URL}?path=email`, {
+        method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    async function loadHistory(email) {
+      const res = await fetch(`${WEB_APP_URL}?email=` + encodeURIComponent(email));
+      const rows = await res.json();
+      const body = document.getElementById('historyBody');
+      body.innerHTML = '';
+      rows.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${new Date(r.timestamp).toLocaleString()}</td><td>${r.company}</td><td>${r.total}%</td>`;
+        body.appendChild(tr);
+      });
+    }
+  </script>
+</body>
+</html>
